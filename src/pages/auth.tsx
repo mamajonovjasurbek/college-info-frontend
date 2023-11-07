@@ -5,24 +5,23 @@ import { SubmitHandler, useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import axios from 'axios'
-import { useEffect } from 'react';
 
 
 const instance = axios.create(
     {
-        baseURL : "localhost:5000/"
+        baseURL : "https://college-info-backend-production.up.railway.app"
     }
 )
 
 type Inputs = {
-    login: string;
+    email: string;
     password: string;
 };
 
 const  login  = async(data : Inputs) =>{
-    const response = await instance.post("/login" , data)
+    const response = await instance.post("/login" ,data)
 
-    return response
+    return await response
 }
 
 
@@ -38,9 +37,15 @@ export const Auth = () => {
         },
     });
         
+    // const {data} = useQuery({
+    //     queryKey: ["validate"],
+    //     queryFn: () => instance.get("/validate")
+    // })
+    // console.log(data);
+    
     const { register, handleSubmit } = useForm<Inputs>();
 
-    const onSubmit: SubmitHandler<Inputs> = async(data) => {        
+    const onSubmit: SubmitHandler<Inputs> = (data) => {        
         mutate(data)
     };
     return (
@@ -53,18 +58,18 @@ export const Auth = () => {
                 </h1>
                 <InputLabel
                     className="text-sky-500"
-                    htmlFor="login">
-                    Login
+                    htmlFor="email">
+                    Email
                 </InputLabel>
                 <Input
-                    placeholder="Login"
+                    placeholder="Email"
                     id="login"
                     startAdornment={
                         <InputAdornment position="start">
                             <AccountCircle />
                         </InputAdornment>
                     }
-                    {...register('login')}
+                    {...register('email')}
                 />
                 <InputLabel htmlFor="login">Password</InputLabel>
                 <Input
