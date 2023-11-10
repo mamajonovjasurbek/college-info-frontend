@@ -2,7 +2,7 @@ import ReactDOM from 'react-dom/client';
 import './index.css';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import { Root } from './pages/root.tsx';
-import Home from './pages/home.tsx';
+import Home, {loader as homeLoader} from './pages/home.tsx';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Auth } from './pages/auth.tsx';
 
@@ -14,6 +14,7 @@ const router = createBrowserRouter([
             {
                 index: true,
                 element: <Home />,
+                loader : homeLoader
             },
         ],
     },

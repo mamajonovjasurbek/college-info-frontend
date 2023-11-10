@@ -1,4 +1,3 @@
-import React from 'react';
 import {
     ColumnDef,
     flexRender,
@@ -9,7 +8,6 @@ import {
 } from '@tanstack/react-table';
 import IndeterminateCheckbox from '../components/selectionCheck';
 import Filter from '../components/filter';
-import { Person } from '../types/person';
 import { Pagination } from '../components/pagination';
 import {
     Paper,
@@ -21,16 +19,36 @@ import {
     TableRow,
 } from '@mui/material';
 import { DefaultData } from '../data';
+import React from "react";
+import {useQuery} from "@tanstack/react-query";
+import axios from "axios";
+import {useLoaderData} from "react-router-dom";
+
+const instance = axios.create(
+    {
+        baseURL : "http://localhost:5000/"
+    }
+)
+export const loader = async () =>{
+    const response = await instance.get('/students');
+
+    return response
+}
 
 
 
 export default function Home() {
+
+    const data = useLoaderData()
+
+    console.log(data.data)
+    const columnsData = data.data
     const rerender = React.useReducer(() => ({}), {})[1];
 
     const [rowSelection, setRowSelection] = React.useState({});
     const [globalFilter, setGlobalFilter] = React.useState('');
 
-    const columns = React.useMemo<ColumnDef<Person>[]>(
+    const columns= React.useMemo<ColumnDef>(
         () => [
             {
                 id: 'select',
@@ -59,72 +77,68 @@ export default function Home() {
 
             {
                 header: 'Fish',
-                accessorKey: 'fish',
+                accessorKey: 'Name',
                 cell: (info) => info.getValue(),
-                footer: (props) => props.column.id,
             },
-            {
-                header: "Tug'ilgan sanasi",
-                accessorKey: 'birthDate',
-                cell: (info) => info.getValue(),
-                footer: (props) => props.column.id,
-            },
+            // {
+            //     header: "Tug'ilgan sanasi",
+            //     accessorKey: 'BirthDate',
+            //     cell: (info) => info.getValue(),
+            // },
             {
                 header: "Tug'ilgan joyi",
-                accessorKey: 'location',
+                accessorKey: 'Location',
                 cell: (info) => info.getValue(),
-                footer: (props) => props.column.id,
             },
             {
                 header: 'Passport raqami',
-                accessorKey: 'passportNumber',
+                accessorKey: 'PassNumber',
                 cell: (info) => info.getValue(),
-                footer: (props) => props.column.id,
+            },
+            {
+                header: 'PINFL',
+                accessorKey: 'PINFL',
+                cell: (info) => info.getValue(),
             },
             {
                 header: 'Telefon raqami',
-                accessorKey: 'phoneNumber',
+                accessorKey: 'PhoneNumber',
                 cell: (info) => info.getValue(),
-                footer: (props) => props.column.id,
             },
             {
                 header: "O'quv yonalishi",
-                accessorKey: 'eduDir',
+                accessorKey: 'StudyDir',
                 cell: (info) => info.getValue(),
-                footer: (props) => props.column.id,
             },
             {
                 header: 'Kursi',
-                accessorKey: 'course',
+                accessorKey: 'Course',
                 cell: (info) => info.getValue(),
-                footer: (props) => props.column.id,
             },
-            {
-                header: 'Guruxi',
-                accessorKey: 'group',
-                cell: (info) => info.getValue(),
-                footer: (props) => props.column.id,
-            },
+
             {
                 header: 'Otasi',
-                accessorKey: 'father',
+                accessorKey: 'Father',
                 cell: (info) => info.getValue(),
-                footer: (props) => props.column.id,
             },
             {
                 header: 'Onasi',
-                accessorKey: 'mother',
+                accessorKey: 'Mother',
                 cell: (info) => info.getValue(),
-                footer: (props) => props.column.id,
+            },
+
+            {
+                header: 'Guruxi',
+                accessorKey: 'Group',
+                cell: (info) => info.getValue(),
             },
         ],
         [],
     );
 
-    const [data, setData] = React.useState(DefaultData);
 
     const table = useReactTable({
-        data,
+        columnsData,
         columns,
         state: {
             rowSelection,
@@ -148,7 +162,7 @@ export default function Home() {
             </div>
             <div className="h-2" />
             <TableContainer component={Paper}>
-                <Table>
+                <Table >
                     <TableHead>
                         {table.getHeaderGroups().map((headerGroup) => (
                             <TableRow key={headerGroup.id}>
@@ -160,11 +174,11 @@ export default function Home() {
                                             {header.isPlaceholder ? null : (
                                                 <>
                                                     <div className='text-center uppercase font-bold'>
-                                                    {flexRender(
-                                                        header.column.columnDef
-                                                            .header,
-                                                        header.getContext(),
-                                                    )}
+                                                        {flexRender(
+                                                            header.column.columnDef
+                                                                .header,
+                                                            header.getContext(),
+                                                        )}
                                                     </div>
                                                     {header.column.getCanFilter() ? (
                                                         <div>
@@ -236,3 +250,7 @@ export default function Home() {
         </div>
     );
 }
+
+
+
+
