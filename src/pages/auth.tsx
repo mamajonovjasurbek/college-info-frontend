@@ -1,27 +1,25 @@
-import { AccountCircle } from '@mui/icons-material';
+import {AccountCircle} from '@mui/icons-material';
 import KeyIcon from '@mui/icons-material/Key';
-import { Button, Input, InputAdornment, InputLabel } from '@mui/material';
-import { SubmitHandler, useForm } from 'react-hook-form';
-import { useNavigate } from 'react-router-dom';
-import { useMutation, useQuery } from '@tanstack/react-query';
+import {Button, Input, InputAdornment, InputLabel} from '@mui/material';
+import {SubmitHandler, useForm} from 'react-hook-form';
+import {useNavigate} from 'react-router-dom';
+import {useMutation,} from '@tanstack/react-query';
 import axios from 'axios'
-
+import Cookies from 'universal-cookie';
 
 const instance = axios.create(
     {
-        baseURL : "https://college-info-backend-production.up.railway.app"
+        baseURL : "http://localhost:5000"
     }
 )
 
 type Inputs = {
-    email: string;
+    login: string;
     password: string;
 };
 
 const  login  = async(data : Inputs) =>{
-    const response = await instance.post("/login" ,data)
-
-    return await response
+    return await instance.post("/login", data)
 }
 
 
@@ -29,25 +27,26 @@ export const Auth = () => {
 
 
     const navigate = useNavigate();
-    const {mutate } = useMutation({
+    const {data,mutate } = useMutation({
         mutationKey: ['login'],
         mutationFn:login,
-        onSuccess: () => {
-            navigate('/');
-        },
     });
-        
-    // const {data} = useQuery({
-    //     queryKey: ["validate"],
-    //     queryFn: () => instance.get("/validate")
-    // })
-    // console.log(data);
-    
+
+
+
     const { register, handleSubmit } = useForm<Inputs>();
 
     const onSubmit: SubmitHandler<Inputs> = (data) => {        
         mutate(data)
     };
+
+    if (data?.data){
+        const cookies = new Cookies();
+        cookies.set('Authorization', data?.data, { path: '/' ,  sameSite: 'none', secure: true });
+
+        navigate('/');
+    }
+
     return (
         <div className="w-screen h-screen flex justify-center items-center bg-white">
             <form
@@ -58,18 +57,18 @@ export const Auth = () => {
                 </h1>
                 <InputLabel
                     className="text-sky-500"
-                    htmlFor="email">
+                    htmlFor="login">
                     Email
                 </InputLabel>
                 <Input
-                    placeholder="Email"
+                    placeholder="Login"
                     id="login"
                     startAdornment={
                         <InputAdornment position="start">
                             <AccountCircle />
                         </InputAdornment>
                     }
-                    {...register('email')}
+                    {...register('login')}
                 />
                 <InputLabel htmlFor="login">Password</InputLabel>
                 <Input

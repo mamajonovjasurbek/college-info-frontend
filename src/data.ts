@@ -1,6 +1,6 @@
-import { Person } from "./types/person";
+import { Student } from "./types/student.ts";
 
-export const DefaultData: Person[] = [
+export const DefaultData: Student[] = [
     {
         fish: 'dsdadad sadas',
         birthDate: '2001.25.03',
@@ -10,8 +10,8 @@ export const DefaultData: Person[] = [
         eduDir: 'ekonom',
         course: 'matem',
         group: '654-19',
-        father: 'adsdad asdasd',
-        mother: 'dsadasd  dasd a',
+        father: '',
+        mother: '',
     },
     {
         fish: 'cgcvbb sadas',
