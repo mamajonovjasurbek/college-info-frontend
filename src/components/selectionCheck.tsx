@@ -16,6 +16,9 @@ export default function IndeterminateCheckbox({
 
   return (
     <Checkbox 
+    sx={{
+      width : "auto"
+    }}
     ref={ref}
     className={className + " cursor-pointer"}
     {...rest}

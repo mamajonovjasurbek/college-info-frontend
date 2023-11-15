@@ -4,7 +4,14 @@ export default {
     './src/**/*.{js,jsx,ts,tsx}',
   ],
   theme: {
-    extend: {},
+    extend: {
+      colors: {
+        'dark-bg': '#27374D',
+        'dark-bg-meddium' : "#526D82",
+        'dark-bg-lite' : "#9DB2BF",
+        'dark-bg-text' : "#DDE6ED"
+      },
+    },
   },
   plugins: [],
 }

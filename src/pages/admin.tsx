@@ -2,11 +2,11 @@
 import axios from "axios";
 import {IStudent} from "../types/student.ts";
 import {useEffect , useState ,useCallback} from "react";
-import TableComponentStudents from "../components/table/table-student.tsx";
 import {useNavigate} from "react-router-dom";
 import Cookies from "universal-cookie";
+import TableComponentUsers from "../components/table/table-users.tsx";
 
-export default function Home() {
+export default function Admin() {
     const navigate = useNavigate()
     const [data ,setData] = useState<IStudent[]>([])
     const instance = axios.create(
@@ -48,7 +48,7 @@ export default function Home() {
     
 
     return(
-        <TableComponentStudents data={data}/>
+        <TableComponentUsers data={data}/>
     )
 }
 

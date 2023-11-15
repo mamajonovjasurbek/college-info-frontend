@@ -5,8 +5,8 @@ import {Container} from "@mui/material";
 export const Root = () => {
     return (
         <div>
+            <Header/>
             <Container  fixed>
-                <Header/>
                 <Outlet/>
             </Container>
         </div>
