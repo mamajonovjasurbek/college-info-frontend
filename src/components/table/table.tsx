@@ -12,6 +12,7 @@ import {Paper, TableBody,Table, TableCell, TableContainer, TableHead, TableRow} 
 import Filter from "../filter.tsx";
 import {Pagination} from "../pagination.tsx";
 import axios from "axios";
+// @ts-ignore
 import { saveAs } from 'file-saver';
 
 const instance = axios.create(
@@ -24,6 +25,7 @@ type Props  = {
     data : IStudent[];
 }
 
+// @ts-ignore
 const columns = [
         {
             id: 'select',

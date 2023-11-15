@@ -23,10 +23,11 @@ export default function Home() {
             console.log(token)
             const response  = await instance.get<IStudent[]>('/students' ,{
                 method: "GET",
-                headers:{
-                    'Authorization': token
-                }
+                headers: {
+                    "Authorization" : `Bearer ${token}`
+                }    
             })
+            
             setData(response.data)
 
         }

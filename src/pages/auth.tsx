@@ -42,7 +42,8 @@ export const Auth = () => {
 
     if (data?.data){
         const cookies = new Cookies();
-        cookies.set('Authorization', data?.data, { path: '/' ,  sameSite: 'none', secure: true });
+        console.log(data?.data)
+        cookies.set('Authorization', data?.data?.Authorization, { path: '/' ,  sameSite: 'none', secure: true });
 
         navigate('/');
     }
