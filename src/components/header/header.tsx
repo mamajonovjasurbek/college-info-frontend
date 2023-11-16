@@ -11,7 +11,7 @@ export const Header = () => {
                 </Grid>
                 <Grid item md={4} className="flex justify-center gap-4 text-white text-xl uppercase font-medium items-center">
                     <NavLink to={"/"}>Jadval</NavLink>
-                    <NavLink to={"/"}>Admin</NavLink>
+                    <NavLink to={"/users"}>Admin</NavLink>
                 </Grid>
                 <Grid item md={4} className="text-end flex justify-end">
                     <Avatar alt="Remy Sharp" src="/image-w856.webp" />

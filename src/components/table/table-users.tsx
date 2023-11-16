@@ -1,15 +1,13 @@
 import React , {useMemo} from "react";
-import IndeterminateCheckbox from "../selectionCheck.tsx";
-import {IStudent} from "../../types/student.ts";
 import {
-    ColumnDef,
     flexRender,
     getCoreRowModel,
     getFilteredRowModel,
     getPaginationRowModel,
     useReactTable,
 } from "@tanstack/react-table";
-import {Paper, TableBody,Table, TableCell, TableContainer, TableHead, TableRow, colors} from "@mui/material";
+import {IUser} from "../../types/user.ts";
+import {Paper, TableBody,Table, TableCell, TableContainer, TableHead, TableRow} from "@mui/material";
 
 import Filter from "../filter.tsx";
 import {Pagination} from "../pagination.tsx";
@@ -27,92 +25,27 @@ const instance = axios.create(
 )
 
 type Props  = {
-    data : IStudent[];
+    data : IUser[];
 }
 
-const columns = [
-    {
-        id: 'select',
-        header: ({ table }) => (
-            <IndeterminateCheckbox
-                {...{
-                    checked: table.getIsAllRowsSelected(),
-                    indeterminate: table.getIsSomeRowsSelected(),
-                    onChange: table.getToggleAllRowsSelectedHandler(),
-                }}
-            />
-        ),
-        cell: ({ row }) => (
-            <div className="px-1">
-                <IndeterminateCheckbox
-                    {...{
-                        checked: row.getIsSelected(),
-                        disabled: !row.getCanSelect(),
-                        indeterminate: row.getIsSomeSelected(),
-                        onChange: row.getToggleSelectedHandler(),
-                    }}
-                />
-            </div>
-        ),
-    },
+const columns= [
 
     {
-        header: 'Fish',
-        accessorKey: 'name',
+        header: 'Login',
+        accessorKey: 'login',
         cell: (info) => info.getValue(),
     },
     {
-        header: "Tug'ilgan sanasi",
-        accessorKey: 'birth_date',
+        header: "Roli",
+        accessorKey: 'role',
         cell: (info) => info.getValue(),
     },
     {
-        header: "Tug'ilgan joyi",
-        accessorKey: 'location',
-        cell: (info) => info.getValue(),
-    },
-    {
-        header: 'Passport raqami',
-        accessorKey: 'pass_number',
-        cell: (info) => info.getValue(),
-    },
-    {
-        header: 'PINFL',
-        accessorKey: 'pinfl',
-        cell: (info) => info.getValue(),
-    },
-    {
-        header: 'Telefon raqami',
-        accessorKey: 'phone_number',
-        cell: (info) => info.getValue(),
-    },
-    {
-        header: "O'quv yonalishi",
-        accessorKey: 'study_dir',
-        cell: (info) => info.getValue(),
-    },
-    {
-        header: 'Kursi',
-        accessorKey: 'course',
-        cell: (info) => info.getValue(),
-    },
-
-    {
-        header: 'Otasi',
-        accessorKey: 'father',
-        cell: (info) => info.getValue(),
-    },
-    {
-        header: 'Onasi',
-        accessorKey: 'mother',
-        cell: (info) => info.getValue(),
-    },
-
-    {
-        header: 'Guruxi',
+        header: "Gruppasi",
         accessorKey: 'group',
         cell: (info) => info.getValue(),
     },
+
 ];
 
 
@@ -120,7 +53,6 @@ const columns = [
 
 export default function TableComponentUsers(props : Props){
     const [rowSelection, setRowSelection] = React.useState({});
-    // const [globalFilter, setGlobalFilter] = React.useState('');
     const data = useMemo(() => props.data, [props.data]);
 
     
@@ -140,11 +72,11 @@ export default function TableComponentUsers(props : Props){
 
 
 
-    const postStudentsData = async (data:IStudent[]) =>{
+    const postStudentsData = async (data:IUser[]) =>{
         const cookies = new Cookies();
         const token = cookies.get("Authorization")
         
-        await instance<IStudent[]>({
+        await instance<IUser[]>({
             url : '/students/excel',
             method: 'POST',
             data:  data,
@@ -157,7 +89,7 @@ export default function TableComponentUsers(props : Props){
     }
 
     const handleRowSelectionData = async () =>{
-        const students:IStudent[] = []
+        const students:IUser[] = []
 
         for (let i = 0 ; i < table.getSelectedRowModel().flatRows?.length ; i++){
 

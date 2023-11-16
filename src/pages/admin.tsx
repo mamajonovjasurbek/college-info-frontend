@@ -1,14 +1,14 @@
 
 import axios from "axios";
-import {IStudent} from "../types/student.ts";
 import {useEffect , useState ,useCallback} from "react";
 import {useNavigate} from "react-router-dom";
 import Cookies from "universal-cookie";
 import TableComponentUsers from "../components/table/table-users.tsx";
+import {IUser} from "../types/user.ts";
 
 export default function Admin() {
     const navigate = useNavigate()
-    const [data ,setData] = useState<IStudent[]>([])
+    const [data ,setData] = useState<IUser[]>([])
     const instance = axios.create(
         {
             baseURL : "http://localhost:5000/"
@@ -21,7 +21,7 @@ export default function Admin() {
             const token = cookies.get("Authorization")
 
             console.log(token)
-            const response  = await instance.get<IStudent[]>('/students' ,{
+            const response  = await instance.get<IUser[]>('/users' ,{
                 method: "GET",
                 headers: {
                     "Authorization" : `Bearer ${token}`
