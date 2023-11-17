@@ -1,4 +1,3 @@
-import React , {useMemo} from "react";
 import {
     flexRender,
     getCoreRowModel,
@@ -7,7 +6,7 @@ import {
     useReactTable,
 } from "@tanstack/react-table";
 import {IUser} from "../../types/user.ts";
-import {Paper, TableBody,Table, TableCell, TableContainer, TableHead, TableRow} from "@mui/material";
+import {Paper, TableBody, Table, TableCell, TableContainer, TableHead, TableRow, Button} from "@mui/material";
 
 import Filter from "../filter.tsx";
 import {Pagination} from "../pagination.tsx";
@@ -15,6 +14,8 @@ import axios from "axios";
 // @ts-ignore
 import { saveAs } from 'file-saver';
 import Cookies from "universal-cookie";
+import { useMemo, useState } from "react";
+import UserUpdateModal from "../modals/usersUpdateModal.tsx";
 
 
 // rgb(231, 246, 242)
@@ -28,34 +29,47 @@ type Props  = {
     data : IUser[];
 }
 
-const columns= [
 
-    {
-        header: 'Login',
-        accessorKey: 'login',
-        cell: (info) => info.getValue(),
-    },
-    {
-        header: "Roli",
-        accessorKey: 'role',
-        cell: (info) => info.getValue(),
-    },
-    {
-        header: "Gruppasi",
-        accessorKey: 'group',
-        cell: (info) => info.getValue(),
-    },
-
-];
 
 
 
 
 export default function TableComponentUsers(props : Props){
-    const [rowSelection, setRowSelection] = React.useState({});
+    const [rowSelection, setRowSelection] = useState({});
     const data = useMemo(() => props.data, [props.data]);
-
+    const [showModal , setShowModal] = useState(false)
+    const [userID , setUserID] = useState(0)
+    const columns= [
+        {
+            header: 'ID',
+            accessorKey: 'id',
+            cell: (info) => info.getValue(),
+        },
+        {
+            header: 'Login',
+            accessorKey: 'login',
+            cell: (info) => info.getValue(),
+        },
+        {
+            header: "Roli",
+            accessorKey: 'role',
+            cell: (info) => info.getValue(),
+        },
+        {
+            header: "Gruppasi",
+            accessorKey: 'group',
+            cell: (info) => info.getValue(),
+        },
+        {
+            header: "Редактирование",
+            cell: ({row}) => (<div className="flex items-center justify-center"><Button onClick={()=>{
+                setShowModal(true)
+                setUserID(row.getValue("id"))
+            }} variant="contained">Изменить</Button></div>),
+        }
     
+    ];
+
     const table = useReactTable({
         data,
         columns,
@@ -101,17 +115,11 @@ export default function TableComponentUsers(props : Props){
         await  postStudentsData(students);
     }
 
+    
 
     return (
         <div>
-            {/* <div>
-                <input
-                    value={globalFilter ?? ''}
-                    onChange={(e) => setGlobalFilter(e.target.value)}
-                    className="min-w-fit px-2  h-10 bg-dark-bg-text  text-dark-bg"
-                    placeholder="Search all columns..."
-                />
-            </div> */}
+            <UserUpdateModal show={showModal} id={userID} showHandler = {setShowModal}/>
             <div className="h-2" />
             <span className="flex items-center gap-4 mb-4 text-dark-bg-text">
                     Betga o'tish:
@@ -143,11 +151,6 @@ export default function TableComponentUsers(props : Props){
                 </span>
             
             <TableContainer
-            // sx={{
-            //     backgroundColor: "rgba(0,0,0,0)",
-            //     border : "1px solid #fff",
-            //     color : "#fff"
-            // }}
             variant="outlined" component={Paper}>
                 <Table >
                     <TableHead >
