@@ -56,11 +56,6 @@ const columns = [
         ),
     },
 
-    // {
-    //     header: 'ID',
-    //     accessorKey: 'id',
-    //     cell: (info) => info.getValue(),
-    // },
     {
         header: 'Fish',
         accessorKey: 'name',
@@ -125,9 +120,7 @@ const columns = [
 
 export default function TableComponentStudents(props : Props){
     const [rowSelection, setRowSelection] = React.useState({});
-    // const [globalFilter, setGlobalFilter] = React.useState('');
     const data = useMemo(() => props.data, [props.data]);
-
     
     const table = useReactTable({
         data,
@@ -177,14 +170,6 @@ export default function TableComponentStudents(props : Props){
 
     return (
         <div>
-            {/* <div>
-                <input
-                    value={globalFilter ?? ''}
-                    onChange={(e) => setGlobalFilter(e.target.value)}
-                    className="min-w-fit px-2  h-10 bg-dark-bg-text  text-dark-bg"
-                    placeholder="Search all columns..."
-                />
-            </div> */}
             <div className="h-2" />
             <span className="flex items-center gap-4 mb-4 text-dark-bg-text">
                     Betga o'tish:
@@ -216,11 +201,6 @@ export default function TableComponentStudents(props : Props){
                 </span>
             
             <TableContainer
-            // sx={{
-            //     backgroundColor: "rgba(0,0,0,0)",
-            //     border : "1px solid #fff",
-            //     color : "#fff"
-            // }}
             variant="outlined" component={Paper}>
                 <Table >
                     <TableHead >

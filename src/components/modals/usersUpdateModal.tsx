@@ -1,33 +1,16 @@
+/* eslint-disable react-refresh/only-export-components */
 import { Box, Button, Input, InputLabel, Modal } from '@mui/material';
-import { useMutation, useQuery } from '@tanstack/react-query';
-import axios from 'axios';
+import { useMutation} from '@tanstack/react-query';
 import { Dispatch, SetStateAction, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import Cookies from 'universal-cookie';
-import { IUser, IUserPassword } from '../../types/user';
+import { IUserPassword } from '../../types/user';
+import { updataUserByID } from '../../utils/https';
 
 interface IProps {
     show: boolean;
     id: number;
     showHandler: Dispatch<SetStateAction<boolean>>;
 }
-
-const instance = axios.create({
-    baseURL: 'http://localhost:5000/',
-});
-
-const getUserByID = async (id: number) => {
-    const cookies = new Cookies();
-    const token = await cookies.get('Authorization');
-
-    const response = await instance.get('/users' + id, {
-        headers: {
-            Authorization: `Bearer ${token}`,
-        },
-    });
-
-    return response;
-};
 
 const style = {
     position: 'absolute',
@@ -39,40 +22,26 @@ const style = {
     border: '2px solid #000',
     boxShadow: 24,
     p: 4,
-  };
+};
 
 export default function UserUpdateModal(props: IProps) {
-    const [same , setSame] = useState(true)
+    const [same, setSame] = useState(true);
     const handleClose = () => props.showHandler(false);
-    const {mutate} = useMutation({
-        mutationFn: (id :string ,password : string , token : string) => {
-            console.log(id , password , token)
-          return instance({
-              url : "users/" + id,
-              method : "PUT",
-              data : password,
-              headers: {
-                  "Authorization" : `Bearer ${token}`
-              }
-          })
-        },
-      })
-    
-    
-    const onSubmit = (data:IUserPassword) => {
-        console.log(data);
-        if (data.newPassword  !== data.confirmPassword){
-            setSame(false)
-        }else{
-            const cookies = new Cookies();
-            const token = cookies.get("Authorization")
-
-            console.log(token , props.id.toString() , data.newPassword)
-            mutate(props.id.toString() , data.newPassword , token)
-            setSame(true)
+    const { mutate } = useMutation({
+        mutationFn: updataUserByID,
+        onSuccess : () =>{
+            handleClose()
         }
+    });
 
-        // setSame(true)
+    const onSubmit = (data: IUserPassword) => {
+        console.log(data);
+        if (data.newPassword !== data.confirmPassword) {
+            setSame(false);
+        } else {
+            mutate({id : props.id,  data:  data});
+            setSame(true);
+        }
     };
 
     const { register, handleSubmit } = useForm<IUserPassword>();
@@ -98,7 +67,7 @@ export default function UserUpdateModal(props: IProps) {
                         <Input
                             placeholder="Введите пароль"
                             id="password"
-                            {...register('newPassword' , {required : true})}
+                            {...register('newPassword', { required: true })}
                         />
                         <InputLabel
                             className="text-sky-500"
@@ -108,14 +77,18 @@ export default function UserUpdateModal(props: IProps) {
                         <Input
                             placeholder="Введите пароль"
                             id="confirmPassword"
-                            {...register('confirmPassword', {required : true})}
+                            {...register('confirmPassword', { required: true })}
                         />
                         <Button
                             type="submit"
                             variant="contained">
                             Submit
                         </Button>
-                        {!same && <p className='block text-center text-red-700'>Пароли не одинаковые!</p>}
+                        {!same && (
+                            <p className="block text-center text-red-700">
+                                Пароли не одинаковые!
+                            </p>
+                        )}
                     </form>
                 </Box>
             </Modal>

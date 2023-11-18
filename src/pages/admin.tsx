@@ -1,54 +1,32 @@
 
-import axios from "axios";
-import {useEffect , useState ,useCallback} from "react";
 import {useNavigate} from "react-router-dom";
-import Cookies from "universal-cookie";
 import TableComponentUsers from "../components/table/table-users.tsx";
-import {IUser} from "../types/user.ts";
+import { useQuery } from "@tanstack/react-query";
+import { getUsers } from "../utils/https.ts";
 
 export default function Admin() {
     const navigate = useNavigate()
-    const [data ,setData] = useState<IUser[]>([])
-    const instance = axios.create(
-        {
-            baseURL : "http://localhost:5000/"
-        }
-    )
-    const getStudents = useCallback(async () =>{
-        try {
+   
+    const {data : datas, isLoading , isError} =  useQuery({
+        queryKey: ["users"],
+        queryFn : getUsers
+    })
 
-            const cookies = new Cookies();
-            const token = cookies.get("Authorization")
 
-            console.log(token)
-            const response  = await instance.get<IUser[]>('/users' ,{
-                method: "GET",
-                headers: {
-                    "Authorization" : `Bearer ${token}`
-                }    
-            })
-            
-            setData(response.data)
-
-        }
-        catch (error){
-            console.log(error)
-            navigate("/login")
-        }
-
-    } , [instance ,navigate])
+    if (isLoading) {
+        return(
+            <p>Loading...</p>
+        )
+    }
+    if (isError){
+        navigate('/login')
+    }
 
 
 
-    useEffect(() => {
-        getStudents()
-    }, []);
-
-
-    
 
     return(
-        <TableComponentUsers data={data}/>
+        <TableComponentUsers data={datas}/>
     )
 }
 

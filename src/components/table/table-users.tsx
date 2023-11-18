@@ -29,16 +29,15 @@ type Props  = {
     data : IUser[];
 }
 
-
-
-
-
-
 export default function TableComponentUsers(props : Props){
     const [rowSelection, setRowSelection] = useState({});
+
     const data = useMemo(() => props.data, [props.data]);
+
     const [showModal , setShowModal] = useState(false)
+
     const [userID , setUserID] = useState(0)
+
     const columns= [
         {
             header: 'ID',

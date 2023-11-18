@@ -6,8 +6,6 @@ import Home from './pages/home.tsx';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Auth } from './pages/auth.tsx';
 import Admin from './pages/admin.tsx';
-import { Provider } from 'react-redux';
-import { store } from './store/store.ts';
 const router = createBrowserRouter([
     {
         path: '/',
@@ -34,8 +32,6 @@ export const queryClient = new QueryClient();
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
     <QueryClientProvider client={queryClient}>
-        <Provider store={store}>
             <RouterProvider router={router} />
-        </Provider>
     </QueryClientProvider>,
 );
