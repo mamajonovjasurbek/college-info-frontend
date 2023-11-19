@@ -2,31 +2,29 @@
 import {useNavigate} from "react-router-dom";
 import TableComponentUsers from "../components/table/table-users.tsx";
 import { useQuery } from "@tanstack/react-query";
-import { getUsers } from "../utils/https.ts";
+import {getUsers} from "../utils/https.ts";
+import {useState} from "react";
 
 export default function Admin() {
     const navigate = useNavigate()
-   
-    const {data : datas, isLoading , isError} =  useQuery({
+
+    const {data : usersDatas,isLoading : isUsersLoading , isError : isUsersError} =  useQuery({
         queryKey: ["users"],
         queryFn : getUsers
     })
 
 
-    if (isLoading) {
+
+    if (isUsersLoading ) {
         return(
             <p>Loading...</p>
         )
     }
-    if (isError){
+    if (isUsersError){
         navigate('/login')
     }
-
-
-
-
     return(
-        <TableComponentUsers data={datas}/>
+           <TableComponentUsers users={usersDatas}/>
     )
 }
 

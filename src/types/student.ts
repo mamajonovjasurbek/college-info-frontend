@@ -1,7 +1,12 @@
+
+
 export interface IStudent{
     id: string
     name : string
-    birth_date: string
+    birth_date: {
+        String : string,
+        Valid : boolean
+    }
     location: string
     pass_number: string
     phone_number  : string
@@ -12,3 +17,5 @@ export interface IStudent{
     mother : string
     group: string
   }
+
+

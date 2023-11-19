@@ -1,4 +1,5 @@
 import {
+    Column,
     flexRender,
     getCoreRowModel,
     getFilteredRowModel,
@@ -10,118 +11,114 @@ import {Paper, TableBody, Table, TableCell, TableContainer, TableHead, TableRow,
 
 import Filter from "../filter.tsx";
 import {Pagination} from "../pagination.tsx";
-import axios from "axios";
 // @ts-ignore
 import { saveAs } from 'file-saver';
-import Cookies from "universal-cookie";
-import { useMemo, useState } from "react";
+import React, { useMemo, useState } from "react";
 import UserUpdateModal from "../modals/usersUpdateModal.tsx";
+import UsersDeleteModal from "../modals/usersDeleteModal.tsx";
+import AddUserComponent from "../addUser.tsx";
+import {queryClient} from "../../main.tsx";
 
 
-// rgb(231, 246, 242)
-const instance = axios.create(
-    {
-        baseURL : "http://localhost:5000/"
+function changeRoleToString (role:number) {
+    if (role === 1){
+        return "Супер Админ"
     }
-)
+    if (role === 2){
+        return "Админ"
+    }
+    if (role === 3){
+        return "Учитель"
+    }
+}
+
+function changeGroupString(group : string){
+    if (group === "admin"){
+        return "Все группы"
+    }else {
+        return group
+    }
+}
 
 type Props  = {
-    data : IUser[];
+    users : IUser[];
 }
 
 export default function TableComponentUsers(props : Props){
-    const [rowSelection, setRowSelection] = useState({});
 
-    const data = useMemo(() => props.data, [props.data]);
+    const userData = useMemo(() => props.users, [props.users]);
 
     const [showModal , setShowModal] = useState(false)
 
-    const [userID , setUserID] = useState(0)
+    const [userID , setUserID] = useState("")
 
-    const columns= [
-        {
-            header: 'ID',
-            accessorKey: 'id',
-            cell: (info) => info.getValue(),
-        },
-        {
-            header: 'Login',
-            accessorKey: 'login',
-            cell: (info) => info.getValue(),
-        },
-        {
-            header: "Roli",
-            accessorKey: 'role',
-            cell: (info) => info.getValue(),
-        },
-        {
-            header: "Gruppasi",
-            accessorKey: 'group',
-            cell: (info) => info.getValue(),
-        },
-        {
-            header: "Редактирование",
-            cell: ({row}) => (<div className="flex items-center justify-center"><Button onClick={()=>{
-                setShowModal(true)
-                setUserID(row.getValue("id"))
-            }} variant="contained">Изменить</Button></div>),
-        }
-    
-    ];
+    const [deleteModal , setDeleteModal] = useState(false);
+
+    const reloadTable = () =>{
+        queryClient.invalidateQueries({
+            queryKey: ["users"],
+        });
+    }
+
+    const columns = React.useMemo<Column<IUser>[]>(
+        () => [
+            {
+                header: 'Идентификатор',
+                accessorKey: 'id',
+                cell: (info) => info.getValue(),
+            },
+            {
+                header: 'Логин',
+                accessorKey: 'login',
+                cell: (info) => info.getValue(),
+            },
+            {
+                header: "Роль",
+                accessorKey: 'role_id',
+                cell: (info) => changeRoleToString(info.getValue()),
+            },
+            {
+                header: "Группа",
+                accessorKey: 'group_id',
+                cell: (info) => changeGroupString(info.getValue()),
+            },
+            {
+                header: "Редактирование",
+                cell: ({row}) => (
+                    <div className="flex items-center justify-center gap-2">
+                        <Button onClick={()=>{
+                            setShowModal(true)
+                            setUserID(row.getValue("id"))
+                        }} variant="contained">Изменить
+                        </Button>
+                        <Button color="error"  onClick={()=>{
+                            setDeleteModal(true)
+                            setUserID(row.getValue("id"))
+                        }} variant="contained">Удалить
+                        </Button>
+                    </div>),
+            }
+
+        ],
+        [userData]
+    );
 
     const table = useReactTable({
-        data,
+        data : userData,
         columns,
-        state: {
-            rowSelection,
-        },
-        enableRowSelection: true,
-        onRowSelectionChange: setRowSelection,
         getCoreRowModel: getCoreRowModel(),
         getFilteredRowModel: getFilteredRowModel(),
         getPaginationRowModel: getPaginationRowModel()
     });
 
 
-
-
-    const postStudentsData = async (data:IUser[]) =>{
-        const cookies = new Cookies();
-        const token = cookies.get("Authorization")
-        
-        await instance<IUser[]>({
-            url : '/students/excel',
-            method: 'POST',
-            data:  data,
-            headers: {
-                "Authorization" : `Bearer ${token}`
-            },  
-            responseType: "blob"
-        }).then(result => {console.log(result)
-            saveAs(result.data, "result.xlsx")})
-    }
-
-    const handleRowSelectionData = async () =>{
-        const students:IUser[] = []
-
-        for (let i = 0 ; i < table.getSelectedRowModel().flatRows?.length ; i++){
-
-            students.push(table.getSelectedRowModel().flatRows[i].original)
-        }
-
-        console.log(students)
-
-        await  postStudentsData(students);
-    }
-
-    
-
     return (
         <div>
+            <UsersDeleteModal show={deleteModal} id={userID} showHandler={setDeleteModal}/>
             <UserUpdateModal show={showModal} id={userID} showHandler = {setShowModal}/>
             <div className="h-2" />
             <span className="flex items-center gap-4 mb-4 text-dark-bg-text">
-                    Betga o'tish:
+                    Перейти на страницу:
                     <input
                         type="number"
                         defaultValue={table.getState().pagination.pageIndex + 1}
@@ -143,12 +140,18 @@ export default function TableComponentUsers(props : Props){
                         <option
                             key={pageSize}
                             value={pageSize}>
-                            Ko'rish {pageSize}
+                            Показать: {pageSize}
                         </option>
                     ))}
                 </select>
+                <AddUserComponent/>
+                 <Button
+                     variant = "contained"
+                     onClick={reloadTable}>
+                    Обновить таблицу
+                </Button>
                 </span>
-            
+
             <TableContainer
             variant="outlined" component={Paper}>
                 <Table >
@@ -232,13 +235,6 @@ export default function TableComponentUsers(props : Props){
             {/*    </button>*/}
             {/*</div>*/}
 
-            <div>
-                <button
-                    className="border rounded p-2 mb-2"
-                    onClick={handleRowSelectionData}>
-                    Log `rowSelection` state
-                </button>
-            </div>
             <div>
                 <button
                     className="border rounded p-2 mb-2"

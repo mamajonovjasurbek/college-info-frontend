@@ -44,8 +44,8 @@ export const Auth = () => {
         const cookies = new Cookies();
         console.log(data?.data)
         cookies.set('Authorization', data?.data?.Authorization, { path: '/' ,  sameSite: 'none', secure: true });
-
-        navigate('/');
+        cookies.set('Role', data?.data?.Role, { path: '/' ,  sameSite: 'none', secure: true });
+        navigate('/home');
     }
 
     return (
@@ -54,15 +54,15 @@ export const Auth = () => {
                 onSubmit={handleSubmit(onSubmit)}
                 className="border-sky-500 border-2 p-10 rounded-lg flex flex-col gap-6">
                 <h1 className="text-2xl text-center text-sky-500">
-                    Authorization
+                    Авторизация
                 </h1>
                 <InputLabel
                     className="text-sky-500"
                     htmlFor="login">
-                    Email
+                    Логин
                 </InputLabel>
                 <Input
-                    placeholder="Login"
+                    placeholder="Логин"
                     id="login"
                     startAdornment={
                         <InputAdornment position="start">
@@ -71,9 +71,11 @@ export const Auth = () => {
                     }
                     {...register('login')}
                 />
-                <InputLabel htmlFor="login">Password</InputLabel>
+                <InputLabel htmlFor="login">Пароль</InputLabel>
                 <Input
-                    id="Password"
+                    placeholder = "Пароль"
+                    type = "password"
+                    id="password"
                     startAdornment={
                         <InputAdornment position="start">
                             <KeyIcon />
@@ -82,9 +84,10 @@ export const Auth = () => {
                     {...register('password')}
                 />
                 <Button
+
                     type="submit"
                     variant="contained">
-                    Submit
+                    Отправить
                 </Button>
             </form>
         </div>

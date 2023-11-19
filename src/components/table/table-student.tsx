@@ -2,14 +2,13 @@ import React , {useMemo} from "react";
 import IndeterminateCheckbox from "../selectionCheck.tsx";
 import {IStudent} from "../../types/student.ts";
 import {
-    ColumnDef,
     flexRender,
     getCoreRowModel,
     getFilteredRowModel,
     getPaginationRowModel,
     useReactTable,
 } from "@tanstack/react-table";
-import {Paper, TableBody,Table, TableCell, TableContainer, TableHead, TableRow, colors} from "@mui/material";
+import {Paper, TableBody, Table, TableCell, TableContainer, TableHead, TableRow, Button} from "@mui/material";
 
 import Filter from "../filter.tsx";
 import {Pagination} from "../pagination.tsx";
@@ -17,6 +16,8 @@ import axios from "axios";
 // @ts-ignore
 import { saveAs } from 'file-saver';
 import Cookies from "universal-cookie";
+import {tableCellStyle, tableHeaderStyle} from "../../styles/mui-styles.ts";
+import {queryClient} from "../../main.tsx";
 
 
 // rgb(231, 246, 242)
@@ -57,59 +58,59 @@ const columns = [
     },
 
     {
-        header: 'Fish',
+        header: 'ФИШ',
         accessorKey: 'name',
         cell: (info) => info.getValue(),
     },
     {
-        header: "Tug'ilgan sanasi",
+        header: "Дата рождения",
         accessorKey: 'birth_date',
-        cell: (info) => info.getValue(),
+        cell: (info) => info.getValue().String,
     },
     {
-        header: "Tug'ilgan joyi",
+        header: "Место рождения",
         accessorKey: 'location',
         cell: (info) => info.getValue(),
     },
     {
-        header: 'Passport raqami',
+        header: 'Номер паспорта',
         accessorKey: 'pass_number',
         cell: (info) => info.getValue(),
     },
     {
-        header: 'PINFL',
+        header: 'ПИНФЛ',
         accessorKey: 'pinfl',
         cell: (info) => info.getValue(),
     },
     {
-        header: 'Telefon raqami',
+        header: 'Номер телефона',
         accessorKey: 'phone_number',
         cell: (info) => info.getValue(),
     },
     {
-        header: "O'quv yonalishi",
+        header: "Направление",
         accessorKey: 'study_dir',
         cell: (info) => info.getValue(),
     },
     {
-        header: 'Kursi',
+        header: 'Курс',
         accessorKey: 'course',
         cell: (info) => info.getValue(),
     },
 
     {
-        header: 'Otasi',
+        header: 'Отец',
         accessorKey: 'father',
         cell: (info) => info.getValue(),
     },
     {
-        header: 'Onasi',
+        header: 'Мама',
         accessorKey: 'mother',
         cell: (info) => info.getValue(),
     },
 
     {
-        header: 'Guruxi',
+        header: 'Группа',
         accessorKey: 'group',
         cell: (info) => info.getValue(),
     },
@@ -134,9 +135,6 @@ export default function TableComponentStudents(props : Props){
         getFilteredRowModel: getFilteredRowModel(),
         getPaginationRowModel: getPaginationRowModel()
     });
-
-
-
 
     const postStudentsData = async (data:IStudent[]) =>{
         const cookies = new Cookies();
@@ -167,12 +165,19 @@ export default function TableComponentStudents(props : Props){
         await  postStudentsData(students);
     }
 
+    const reloadTable = () =>{
+        queryClient.invalidateQueries({
+            queryKey: ["students"],
+        });
+    }
+
 
     return (
         <div>
             <div className="h-2" />
             <span className="flex items-center gap-4 mb-4 text-dark-bg-text">
-                    Betga o'tish:
+                    Перейти на страницу:
+
                     <input
                         type="number"
                         defaultValue={table.getState().pagination.pageIndex + 1}
@@ -194,10 +199,20 @@ export default function TableComponentStudents(props : Props){
                         <option
                             key={pageSize}
                             value={pageSize}>
-                            Ko'rish {pageSize}
+                            Показать : {pageSize}
                         </option>
                     ))}
                 </select>
+                <Button
+                    variant = "contained"
+                    onClick={handleRowSelectionData}>
+                    Скачать Excel
+                </Button>
+                 <Button
+                     variant = "contained"
+                     onClick={reloadTable}>
+                    Обновить таблицу
+                </Button>
                 </span>
             
             <TableContainer
@@ -209,14 +224,7 @@ export default function TableComponentStudents(props : Props){
                                 {headerGroup.headers.map((header) => {
                                     return (
                                         <TableCell
-                                            sx={{
-                                                // backgroundColor: "rgba(255,255,255,1)",
-                                                border : "1px solid rgb(34, 9, 44)",
-                                                padding : 2,
-                                                backgroundColor : "rgb(82, 109, 130)",
-                                                color : "rgb(231, 246, 242)",
-                                                // minWidth : 200
-                                            }}
+                                            sx={tableHeaderStyle}
                                             size="medium"
                                             key={header.id}
                                             colSpan={header.colSpan}>
@@ -252,13 +260,7 @@ export default function TableComponentStudents(props : Props){
                                     {row.getVisibleCells().map((cell) => {
                                         return (
                                             <TableCell
-                                            sx={{
-                                                // backgroundColor: "rgba(255,255,255,1)",
-                                                border : "1px solid rgb(34, 9, 44)",
-                                                padding : 2,
-                                                backgroundColor : "rgb(157, 178, 191)",
-                                                color : "rgb(39, 55, 77)"
-                                            }}
+                                            sx={tableCellStyle}
                                             key={cell.id}>
                                                 {flexRender(
                                                     cell.column.columnDef.cell,
@@ -275,33 +277,6 @@ export default function TableComponentStudents(props : Props){
             </TableContainer>
             <Pagination table={table} />
 
-            {/*<div>*/}
-            {/*    <button*/}
-            {/*        className="border rounded p-2 mb-2"*/}
-            {/*        onClick={() => rerender()}>*/}
-            {/*        Force Rerender*/}
-            {/*    </button>*/}
-            {/*</div>*/}
-
-            <div>
-                <button
-                    className="border rounded p-2 mb-2"
-                    onClick={handleRowSelectionData}>
-                    Log `rowSelection` state
-                </button>
-            </div>
-            <div>
-                <button
-                    className="border rounded p-2 mb-2"
-                    onClick={() =>
-                        console.info(
-                            'table.getSelectedRowModel().flatRows',
-                            table.getSelectedRowModel().flatRows,
-                        )
-                    }>
-                    Log table.getSelectedRowModel().flatRows
-                </button>
-            </div>
         </div>
     )
 

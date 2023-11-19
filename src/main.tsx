@@ -8,23 +8,24 @@ import { Auth } from './pages/auth.tsx';
 import Admin from './pages/admin.tsx';
 const router = createBrowserRouter([
     {
-        path: '/',
+        path: '/home',
         element: <Root />,
         children: [
             {
-                index: true,
+                index : true,
                 element: <Home />,
             },
+
             {
-                path : "/users",
+                path: "admin",
                 element: <Admin />,
             },
         ],
     },
 
     {
-        path: '/login',
-        element: <Auth />,
+        path: '/',
+        element: <Auth/>,
     },
 ]);
 

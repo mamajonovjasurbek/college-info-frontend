@@ -1,7 +1,7 @@
 import axios from 'axios';
 import Cookies from 'universal-cookie';
 import { IStudent } from '../types/student';
-import { IUser } from '../types/user';
+import {ICreateUser, IUser} from '../types/user';
 
 
 const instance = axios.create(
@@ -44,7 +44,6 @@ export async function getStudents(){
         const cookies = new Cookies();
         const token = cookies.get("Authorization")
 
-        console.log(token)
         const response  = await instance.get<IStudent[]>('/students' ,{
             method: "GET",
             headers: {
@@ -67,7 +66,6 @@ export async function getUsers(){
         const cookies = new Cookies();
         const token = cookies.get("Authorization")
 
-        console.log(token)
         const response  = await instance.get<IUser[]>('/users' ,{
             method: "GET",
             headers: {
@@ -83,3 +81,86 @@ export async function getUsers(){
     }
 
 }
+
+
+
+export async function deleteUserById(id : string) {
+
+    const cookies = new Cookies();
+    const token = cookies.get('Authorization');
+
+
+    const response = await instance({
+        method: 'delete',
+        url: '/users/' + id,
+        headers: {
+            "Authorization" : `Bearer ${token}`
+        }
+    });
+
+    console.log(response.status);
+    // if (!response.status) {
+    //     const error = new Error('An error occurred while deleting the event');
+
+    //     throw error;
+    // }
+
+    return response.data;
+}
+
+
+export async function fetchGroups() {
+
+    const cookies = new Cookies();
+    const token = cookies.get('Authorization');
+
+
+    const response = await instance({
+        method: 'get',
+        url: '/groups',
+        headers: {
+            "Authorization" : `Bearer ${token}`
+        }
+    });
+
+    console.log(response.status);
+    // if (!response.status) {
+    //     const error = new Error('An error occurred while deleting the event');
+
+    //     throw error;
+    // }
+
+    return response.data;
+}
+
+
+export async function createUser(data : ICreateUser) {
+
+    const cookies = new Cookies();
+    const token = cookies.get('Authorization');
+
+
+    const response = await instance({
+        method: 'post',
+        url: '/signup',
+        data : {
+            login : data.login,
+            password: data.password,
+            role_id : data.role_id,
+            group_id : data.group_id
+        },
+        headers: {
+            "Authorization" : `Bearer ${token}`
+        }
+    });
+
+    console.log(response.status);
+    // if (!response.status) {
+    //     const error = new Error('An error occurred while deleting the event');
+
+    //     throw error;
+    // }
+
+    return response.data;
+}
+
