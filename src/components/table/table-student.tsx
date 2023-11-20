@@ -12,20 +12,10 @@ import {Paper, TableBody, Table, TableCell, TableContainer, TableHead, TableRow,
 
 import Filter from "../filter.tsx";
 import {Pagination} from "../pagination.tsx";
-import axios from "axios";
-// @ts-ignore
-import { saveAs } from 'file-saver';
-import Cookies from "universal-cookie";
 import {tableCellStyle, tableHeaderStyle} from "../../styles/mui-styles.ts";
 import {queryClient} from "../../main.tsx";
-
-
-// rgb(231, 246, 242)
-const instance = axios.create(
-    {
-        baseURL : "http://localhost:5000/"
-    }
-)
+import {useMutation} from "@tanstack/react-query";
+import {postStudentsData} from "../../utils/https.ts";
 
 type Props  = {
     data : IStudent[];
@@ -122,7 +112,12 @@ const columns = [
 export default function TableComponentStudents(props : Props){
     const [rowSelection, setRowSelection] = React.useState({});
     const data = useMemo(() => props.data, [props.data]);
-    
+
+    const { mutate } = useMutation({
+        mutationFn: postStudentsData
+    });
+
+
     const table = useReactTable({
         data,
         columns,
@@ -136,21 +131,7 @@ export default function TableComponentStudents(props : Props){
         getPaginationRowModel: getPaginationRowModel()
     });
 
-    const postStudentsData = async (data:IStudent[]) =>{
-        const cookies = new Cookies();
-        const token = cookies.get("Authorization")
-        
-        await instance<IStudent[]>({
-            url : '/students/excel',
-            method: 'POST',
-            data:  data,
-            headers: {
-                "Authorization" : `Bearer ${token}`
-            },  
-            responseType: "blob"
-        }).then(result => {console.log(result)
-            saveAs(result.data, "result.xlsx")})
-    }
+
 
     const handleRowSelectionData = async () =>{
         const students:IStudent[] = []
@@ -162,7 +143,7 @@ export default function TableComponentStudents(props : Props){
 
         console.log(students)
 
-        await  postStudentsData(students);
+        mutate(students)
     }
 
     const reloadTable = () =>{

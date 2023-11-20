@@ -2,7 +2,7 @@ import axios from 'axios';
 import Cookies from 'universal-cookie';
 import { IStudent } from '../types/student';
 import {ICreateUser, IUser} from '../types/user';
-
+import { saveAs } from 'file-saver';
 
 const instance = axios.create(
     {
@@ -43,7 +43,7 @@ export async function getStudents(){
     try {
         const cookies = new Cookies();
         const token = cookies.get("Authorization")
-
+        console.log(token)
         const response  = await instance.get<IStudent[]>('/students' ,{
             method: "GET",
             headers: {
@@ -162,5 +162,23 @@ export async function createUser(data : ICreateUser) {
     // }
 
     return response.data;
+}
+
+
+
+export async function postStudentsData (data:IStudent[]) {
+    const cookies = new Cookies();
+    const token = cookies.get("Authorization")
+
+    await instance<IStudent[]>({
+        url : '/students/excel',
+        method: 'POST',
+        data:  data,
+        headers: {
+            "Authorization" : `Bearer ${token}`
+        },
+        responseType: "blob"
+    }).then(result => {console.log(result)
+        saveAs(result.data, "result.xlsx")})
 }
 

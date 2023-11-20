@@ -13,8 +13,6 @@ export default function Admin() {
         queryFn : getUsers
     })
 
-
-
     if (isUsersLoading ) {
         return(
             <p>Loading...</p>

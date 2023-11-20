@@ -44,7 +44,8 @@ export const Auth = () => {
         const cookies = new Cookies();
         console.log(data?.data)
         cookies.set('Authorization', data?.data?.Authorization, { path: '/' ,  sameSite: 'none', secure: true });
-        cookies.set('Role', data?.data?.Role, { path: '/' ,  sameSite: 'none', secure: true });
+        cookies.set('role', data?.data?.role, { path: '/' ,  sameSite: 'none', secure: true });
+        cookies.set('name', data?.data?.name, { path: '/' ,  sameSite: 'none', secure: true });
         navigate('/home');
     }
 

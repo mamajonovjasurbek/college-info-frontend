@@ -5,7 +5,7 @@ import Cookies from "universal-cookie";
 export const Header = () => {
 
     const cookies = new Cookies();
-    const role = cookies.get("Role")
+    const role = cookies.get("role")
     console.log(role)
     return (
         <header className="pt-5 pb-5 bg-dark-bg-meddium">
