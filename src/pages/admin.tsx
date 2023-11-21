@@ -3,7 +3,6 @@ import {useNavigate} from "react-router-dom";
 import TableComponentUsers from "../components/table/table-users.tsx";
 import { useQuery } from "@tanstack/react-query";
 import {getUsers} from "../utils/https.ts";
-import {useState} from "react";
 
 export default function Admin() {
     const navigate = useNavigate()
@@ -21,9 +20,20 @@ export default function Admin() {
     if (isUsersError){
         navigate('/login')
     }
-    return(
-           <TableComponentUsers users={usersDatas}/>
-    )
+
+    if(!usersDatas?.length){
+        console.log("no data")
+        return (
+            <p>Нет данных</p>
+        )
+    }
+
+    if (usersDatas?.length){
+        return(
+            <TableComponentUsers users={usersDatas}/>
+        )
+    }
+
 }
 
 
