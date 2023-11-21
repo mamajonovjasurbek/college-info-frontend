@@ -3,6 +3,7 @@ import TableComponentStudents from "../components/table/table-student.tsx";
 import {useNavigate} from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { getStudents } from "../utils/https.ts";
+import { Box, CircularProgress, Typography } from "@mui/material";
 
 export default function Home() {
     const {data : datas, isLoading , isError} =  useQuery({
@@ -15,11 +16,19 @@ export default function Home() {
 
     if (isLoading) {
         return(
-            <p>Loading...</p>
+            <Box sx={{ display: 'flex' }}>
+                <CircularProgress />
+            </Box>
         )
     }
     if (isError){
         navigate('/')
+    }
+
+    if(!datas?.length){
+        return(
+            <Typography variant='h4' color="white">Нет данных</Typography>
+        )
     }
 
 

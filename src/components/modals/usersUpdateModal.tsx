@@ -1,5 +1,5 @@
 /* eslint-disable react-refresh/only-export-components */
-import { Box, Button, Input, InputLabel, Modal } from '@mui/material';
+import { Box, Button, Input, InputLabel, Modal, Typography } from '@mui/material';
 import { useMutation} from '@tanstack/react-query';
 import { Dispatch, SetStateAction, useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -19,9 +19,7 @@ const style = {
     transform: 'translate(-50%, -50%)',
     width: 400,
     bgcolor: 'background.paper',
-    border: '2px solid #000',
     boxShadow: 24,
-    p: 4,
 };
 
 export default function UserUpdateModal(props: IProps) {
@@ -55,10 +53,10 @@ export default function UserUpdateModal(props: IProps) {
                 <Box sx={style}>
                     <form
                         onSubmit={handleSubmit(onSubmit)}
-                        className="border-sky-500 border-2 p-10 rounded-lg flex flex-col gap-6">
-                        <h1 className="text-2xl text-center text-sky-500">
+                        className="border-2 p-10 rounded-lg flex flex-col gap-6">
+                        <Typography variant="h5" className="text-dark-bg text-center">
                             Изменить пароль
-                        </h1>
+                        </Typography>
                         <InputLabel
                             className="text-sky-500"
                             htmlFor="login">
@@ -82,7 +80,7 @@ export default function UserUpdateModal(props: IProps) {
                         <Button
                             type="submit"
                             variant="contained">
-                            Submit
+                            Изменить
                         </Button>
                         {!same && (
                             <p className="block text-center text-red-700">

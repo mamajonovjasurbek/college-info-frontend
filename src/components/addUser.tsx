@@ -1,50 +1,50 @@
-import {Box, Button, Input, InputLabel, MenuItem, Modal, Select, SelectChangeEvent} from "@mui/material";
+import { AlertColor, Box, Button, Input, InputLabel, MenuItem, Modal, Select, SelectChangeEvent, Typography} from "@mui/material";
 import { useMutation , useQuery} from '@tanstack/react-query';
 import {createUser, fetchGroups } from "../utils/https.ts";
 import {useNavigate} from "react-router-dom";
-import {useState} from "react";
+import {Dispatch, SetStateAction, useState} from "react";
 import {useForm} from "react-hook-form";
 import {IGroup} from "../types/group.ts";
 import {ICreateUser} from "../types/user.ts";
 import {queryClient} from "../main.tsx";
+import {  modalStyle } from "../styles/mui-styles.ts";
 
 
-const style = {
-    position: 'absolute',
-    top: '50%',
-    left: '50%',
-    transform: 'translate(-50%, -50%)',
-    width: 400,
-    bgcolor: 'background.paper',
-    border: '2px solid #000',
-    boxShadow: 24,
-    p: 4,
-};
+interface IProps{
+    handleSnackOpen : Dispatch<SetStateAction<boolean>>;
+    handleSnackMessage : Dispatch<SetStateAction<string>>;
+    handleSnackType : Dispatch<SetStateAction<AlertColor>>;
+}
 
-export default  function AddUserComponent(){
+
+export default  function AddUserComponent(props : IProps){
     const {data : groupsDatas, isLoading : isGroupsLoading , isError : isGroupsError} =  useQuery({
         queryKey: ["groups"],
         queryFn : fetchGroups,
     })
 
-
-
     const { register, handleSubmit , reset  } = useForm<ICreateUser>();
 
     const [show, setShow] = useState(false);
+
+    
 
     const handleClose = () => {
         reset()
         setShow(false);
     }
 
-    const { mutate } = useMutation({
+    const { mutate , isError} = useMutation({
         mutationFn: createUser,
         onSuccess : () =>{
             queryClient.invalidateQueries({
                 queryKey: ["users"],
             });
             handleClose()
+            props.handleSnackMessage("Пользователь добавлен успешно")
+            props.handleSnackType("success")
+            props.handleSnackOpen(true)
+
         }
     });
 
@@ -75,7 +75,7 @@ export default  function AddUserComponent(){
 
 
 
-    const onSubmit = (data) => {
+    const onSubmit = (data :ICreateUser) => {
         mutate(data)
     };
 
@@ -85,13 +85,22 @@ export default  function AddUserComponent(){
         )
     }
     if (isGroupsError){
-        navigate('/login')
+        navigate('/')
+    }
+
+    if(isError) {
+        handleClose()
+        props.handleSnackMessage("Ошибка при создании пользователя")
+        props.handleSnackType("error")
+        props.handleSnackOpen(true)
     }
 
 
     return (
         <>
-            <Button onClick={()=>{
+            <Button sx={{
+                width:"fit-content"
+            }} onClick={()=>{
                 setShow(true)
             }} variant="contained">Добавить пользователя
             </Button>
@@ -100,13 +109,22 @@ export default  function AddUserComponent(){
                 onClose={handleClose}
                 aria-labelledby="modal-modal-title"
                 aria-describedby="modal-modal-description">
-                <Box sx={style}>
+                <Box sx={modalStyle}>
                     <form
                         onSubmit={handleSubmit(onSubmit)}
-                        className="border-sky-500 border-2 p-10 rounded-lg flex flex-col gap-6">
-                        <h1 className="text-2xl text-center text-sky-500">
+                        className="border-2 p-10 rounded-lg flex flex-col gap-6">
+                        <Typography variant="h5" className="text-dark-bg">
                             Создать пользователя
-                        </h1>
+                        </Typography>
+                        <InputLabel
+                            htmlFor="login">
+                            Имя
+                        </InputLabel>
+                        <Input
+                            placeholder="Введите имя"
+                            id="name"
+                            {...register('name', { required: true })}
+                        />
                         <InputLabel
                             className="text-sky-500"
                             htmlFor="login">
@@ -143,7 +161,7 @@ export default  function AddUserComponent(){
                             <MenuItem value="">
                                 <em>Не выбрано</em>
                             </MenuItem>
-                            <MenuItem val   ue={2}>Админ</MenuItem>
+                            <MenuItem value={2}>Админ</MenuItem>
                             <MenuItem value={3}>Учитель</MenuItem>
                         </Select>
                         <InputLabel

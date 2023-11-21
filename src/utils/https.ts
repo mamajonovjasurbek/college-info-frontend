@@ -11,7 +11,6 @@ const instance = axios.create(
 )
 
 export async function updataUserByID({ id, data }) {
-    console.log(id, JSON.stringify({ password: data.newPassword }));
 
     const cookies = new Cookies();
     const token = cookies.get('Authorization');
@@ -28,19 +27,13 @@ export async function updataUserByID({ id, data }) {
         }  
     });
 
-    console.log(response.status);
-    // if (!response.status) {
-    //     const error = new Error('An error occurred while deleting the event');
-
-    //     throw error;
-    // }
 
     return response.data;
 }
 
 
 export async function getStudents(){
-    try {
+    
         const cookies = new Cookies();
         const token = cookies.get("Authorization")
         console.log(token)
@@ -52,17 +45,12 @@ export async function getStudents(){
         })
         
         return response.data
-    }
-    catch (error){
-        console.log(error)
-    }
 }
 
 
 
 export async function getUsers(){
-    try {
-
+    
         const cookies = new Cookies();
         const token = cookies.get("Authorization")
 
@@ -75,9 +63,6 @@ export async function getUsers(){
         
         return response.data
 
-    }
-    catch (error){
-        console.log(error)
     }
 
 }
@@ -98,13 +83,6 @@ export async function deleteUserById(id : string) {
         }
     });
 
-    console.log(response.status);
-    // if (!response.status) {
-    //     const error = new Error('An error occurred while deleting the event');
-
-    //     throw error;
-    // }
-
     return response.data;
 }
 
@@ -123,13 +101,6 @@ export async function fetchGroups() {
         }
     });
 
-    console.log(response.status);
-    // if (!response.status) {
-    //     const error = new Error('An error occurred while deleting the event');
-
-    //     throw error;
-    // }
-
     return response.data;
 }
 
@@ -144,6 +115,7 @@ export async function createUser(data : ICreateUser) {
         method: 'post',
         url: '/signup',
         data : {
+            name : data.name ,
             login : data.login,
             password: data.password,
             role_id : data.role_id,
@@ -153,13 +125,6 @@ export async function createUser(data : ICreateUser) {
             "Authorization" : `Bearer ${token}`
         }
     });
-
-    console.log(response.status);
-    // if (!response.status) {
-    //     const error = new Error('An error occurred while deleting the event');
-
-    //     throw error;
-    // }
 
     return response.data;
 }

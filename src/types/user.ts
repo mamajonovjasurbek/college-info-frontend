@@ -1,5 +1,6 @@
 export interface IUser{
     id: string
+    name : string
     login : string
     role_id : string
     group_id : string
@@ -12,6 +13,7 @@ export interface IUserPassword{
 
 
 export interface ICreateUser {
+    name : string
     login : string
     password : string
     role_id : number

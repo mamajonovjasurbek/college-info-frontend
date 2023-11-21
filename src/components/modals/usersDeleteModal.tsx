@@ -1,5 +1,5 @@
 /* eslint-disable react-refresh/only-export-components */
-import { Box, Button ,Modal } from '@mui/material';
+import { Box, Button ,Modal, Typography } from '@mui/material';
 import { useMutation} from '@tanstack/react-query';
 import { Dispatch, SetStateAction } from 'react';
 import {deleteUserById} from '../../utils/https';
@@ -50,24 +50,26 @@ export default function UsersDeleteModal(props: IProps) {
                 aria-describedby="modal-modal-description">
                 <Box sx={style}>
 
-                        <h1 className="text-2xl text-center text-sky-500">
-                            Хотите удалить пользователя ?
-                        </h1>
+                        <Typography variant="h5" className="text-dark-bg text-center">
+                            Удалить пользователя
+                        </Typography>
 
+                        <div className='flex gap-2 justify-center mt-4'>
                         <Button
-                            type="submit"
+                            variant="contained"
+                            color = "error"
+                            onClick = {deleteHandler}
+                            >
+                            Да
+                        </Button>
+                        <Button
                             variant="contained"
                             onClick = {handleClose}
                             >
                             Нет
                         </Button>
-                        <Button
-                            type="submit"
-                            variant="contained"
-                            onClick = {deleteHandler}
-                            >
-                            Да
-                        </Button>
+                       
+                        </div>
                 </Box>
             </Modal>
         </>

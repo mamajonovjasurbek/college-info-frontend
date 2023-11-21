@@ -28,9 +28,9 @@ export const Pagination = ({table}) =>{
                 </button>
                </div>
                 <span className="flex items-center gap-1 text-dark-bg-text">
-                    <div>Page</div>
+                    <div>Страница</div>
                     <strong>
-                        {table.getState().pagination.pageIndex + 1} of{' '}
+                        {table.getState().pagination.pageIndex + 1} из{' '}
                         {table.getPageCount()}
                     </strong>
                 </span>
