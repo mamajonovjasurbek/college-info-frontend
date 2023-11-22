@@ -13,7 +13,9 @@ import { SubmitHandler, useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import { useMutation } from '@tanstack/react-query';
 import axios from 'axios';
-import Cookies from 'universal-cookie';
+import {useCookies} from "react-cookie"
+import { useEffect } from 'react';
+
 
 const instance = axios.create({
     baseURL: 'http://localhost:5000',
@@ -31,9 +33,16 @@ const login = async (data: Inputs) => {
 export const Auth = () => {
     const navigate = useNavigate();
 
+    const [, setAuthCookie] = useCookies(["Authorization"]);
+
+    const [, setRoleCookie] = useCookies(["role"]);
+
+    const [, setNameCookie] = useCookies(["name"]);
+
+
     const { register, handleSubmit } = useForm<Inputs>();
 
-    const { data, mutate, isPending } = useMutation({
+    const { data, mutate, isError ,isPending } = useMutation({
         mutationKey: ['login'],
         mutationFn: login,
     });
@@ -42,26 +51,24 @@ export const Auth = () => {
         mutate(data);
     };
 
-    if (data?.data) {
-        const cookies = new Cookies();
-        console.log(data?.data);
-        cookies.set('Authorization', data?.data?.Authorization, {
-            path: '/',
-            sameSite: 'none',
-            secure: true,
-        });
-        cookies.set('role', data?.data?.role, {
-            path: '/',
-            sameSite: 'none',
-            secure: true,
-        });
-        cookies.set('name', data?.data?.name, {
-            path: '/',
-            sameSite: 'none',
-            secure: true,
-        });
-        navigate('/home');
-    }
+    
+
+    useEffect(() =>{
+        if (data?.data) {
+
+            console.log(data?.data);
+    
+            setAuthCookie("Authorization", data?.data?.Authorization, { path: "/" , sameSite: "none" });
+    
+            setRoleCookie("role", data?.data?.role, { path: "/"  ,sameSite: "none"});
+    
+            setNameCookie("name", data?.data?.name, { path: "/" , sameSite: "none"});
+    
+    
+            navigate('/home');
+        }
+    } , [data, navigate, setAuthCookie, setNameCookie, setRoleCookie])
+
 
     return (
         <div className="bg-dark-bg w-screen h-screen flex justify-center items-center">
@@ -111,6 +118,7 @@ export const Auth = () => {
                             variant="contained">
                             Отправить
                         </Button>
+                        {isError && <p className='text-rose-700 block text-center'>Неправильный логин или пароль</p>}
                     </>
                 )}
             </form>

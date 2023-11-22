@@ -36,14 +36,13 @@ export async function getStudents(){
     
         const cookies = new Cookies();
         const token = cookies.get("Authorization")
-        console.log(token)
         const response  = await instance.get<IStudent[]>('/students' ,{
             method: "GET",
             headers: {
                 "Authorization" : `Bearer ${token}`
             }    
         })
-        
+
         return response.data
 }
 
@@ -65,7 +64,7 @@ export async function getUsers(){
 
     }
 
-}
+
 
 
 
@@ -135,7 +134,7 @@ export async function postStudentsData (data:IStudent[]) {
     const cookies = new Cookies();
     const token = cookies.get("Authorization")
 
-    await instance<IStudent[]>({
+    await instance<IStudent[]>({    
         url : '/students/excel',
         method: 'POST',
         data:  data,

@@ -1,9 +1,17 @@
 /* eslint-disable react-refresh/only-export-components */
-import { Box, Button ,Modal, Typography } from '@mui/material';
-import { useMutation} from '@tanstack/react-query';
-import { Dispatch, SetStateAction } from 'react';
-import {deleteUserById} from '../../utils/https';
-import {queryClient} from "../../main.tsx";
+import {
+    AlertColor,
+    Box,
+    Button,
+    CircularProgress,
+    Modal,
+    Typography,
+} from '@mui/material';
+import { useMutation } from '@tanstack/react-query';
+import { Dispatch, SetStateAction, useState } from 'react';
+import { deleteUserById } from '../../utils/https';
+import { queryClient } from '../../main.tsx';
+import SimpleSnackbar from '../snackbar.tsx';
 
 interface IProps {
     show: boolean;
@@ -24,53 +32,79 @@ const style = {
 };
 
 export default function UsersDeleteModal(props: IProps) {
-    const handleClose = () => props.showHandler(false);
+    const [snack, setSnack] = useState(false);
 
-    const { mutate } = useMutation({
+    const [snackType, setSnackType] = useState<AlertColor>('success');
+
+    const [snackMessage, setSnackMessage] = useState('');
+
+    const { mutate, isError, isPending } = useMutation({
         mutationFn: deleteUserById,
-        onSuccess : () =>{
+        onSuccess: () => {
             queryClient.invalidateQueries({
-                queryKey: ["users"],
+                queryKey: ['users'],
             });
-            handleClose()
-        }
+            handleClose();
+            setSnackMessage('Пользователь удален успешно');
+            setSnackType('success');
+            setSnack(true);
+        },
     });
+
+    const handleClose = () => props.showHandler(false);
 
     const deleteHandler = () => {
         console.log(props.id);
-        mutate(props.id)
+        mutate(props.id);
     };
+
+    if (isError) {
+        handleClose();
+        setSnackMessage('Ошибка при удалении пользователя');
+        setSnackType('error');
+        setSnack(true);
+    }
 
     return (
         <>
+            <SimpleSnackbar
+                show={snack}
+                handleOpen={setSnack}
+                message={snackMessage}
+                type={snackType}
+            />
             <Modal
                 open={props.show}
                 onClose={handleClose}
                 aria-labelledby="modal-modal-title"
                 aria-describedby="modal-modal-description">
-                <Box sx={style}>
-
-                        <Typography variant="h5" className="text-dark-bg text-center">
+                {isPending ? (
+                    <Box sx={{ display: 'flex' }}>
+                        <CircularProgress />
+                    </Box>
+                ) : (
+                    <Box sx={style}>
+                        <Typography
+                            variant="h5"
+                            className="text-dark-bg text-center">
                             Удалить пользователя
                         </Typography>
 
-                        <div className='flex gap-2 justify-center mt-4'>
-                        <Button
-                            variant="contained"
-                            color = "error"
-                            onClick = {deleteHandler}
-                            >
-                            Да
-                        </Button>
-                        <Button
-                            variant="contained"
-                            onClick = {handleClose}
-                            >
-                            Нет
-                        </Button>
-                       
+                        <div className="flex gap-2 justify-center mt-4">
+                            <Button
+                                variant="contained"
+                                color="error"
+                                onClick={deleteHandler}>
+                                Да
+                            </Button>
+                            <Button
+                                variant="contained"
+                                onClick={handleClose}>
+                                Нет
+                            </Button>
                         </div>
-                </Box>
+                    </Box>
+                )}
             </Modal>
         </>
     );

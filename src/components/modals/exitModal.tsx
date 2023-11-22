@@ -24,15 +24,15 @@ const style = {
 export default function ExitModal(props: IProps) {
     const navigate = useNavigate();
 
+    const cookies = new Cookies();
+
     const handleClose = () => props.showHandler(false);
 
     const exitHandler = () => {
         try {
-            const cookies = new Cookies();
-
-            cookies.remove('role');
-            cookies.remove('name');
-            cookies.remove('Authorization');
+            cookies.remove("Authorization");
+            cookies.remove("role");
+            cookies.remove("name");
 
             navigate('/');
         } catch (err) {

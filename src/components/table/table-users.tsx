@@ -20,16 +20,14 @@ import {
 
 import Filter from '../filter.tsx';
 import { Pagination } from '../pagination.tsx';
-// @ts-ignore
-import { saveAs } from 'file-saver';
-import React, { useMemo, useState } from 'react';
+
+import { useMemo, useState } from 'react';
 import UserUpdateModal from '../modals/usersUpdateModal.tsx';
 import UsersDeleteModal from '../modals/usersDeleteModal.tsx';
-import AddUserComponent from '../addUser.tsx';
 import { queryClient } from '../../main.tsx';
 import { tableCellStyle } from '../../styles/mui-styles.ts';
 
-function changeRoleToString(role: number) {
+function changeRoleToString(role: number | unknown) {
     if (role === 1) {
         return 'Супер Админ';
     }
@@ -41,7 +39,7 @@ function changeRoleToString(role: number) {
     }
 }
 
-function changeGroupString(group: string) {
+function changeGroupString(group: string | unknown) {
     if (group === 'admin') {
         return 'Все группы';
     } else {
@@ -68,7 +66,7 @@ export default function TableComponentUsers(props: Props) {
         });
     };
 
-    const columns = React.useMemo<ColumnDef<IUser>[]>(
+    const columns = useMemo<ColumnDef<IUser>[]>(
         () => [
             {
                 header: 'Идентификатор',
@@ -249,8 +247,6 @@ export default function TableComponentUsers(props: Props) {
                 </Table>
             </TableContainer>
             <Pagination table={table} />
-
-
         </div>
     );
 }

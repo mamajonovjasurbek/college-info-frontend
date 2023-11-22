@@ -1,38 +1,39 @@
-import { AlertColor, Box, Button, Input, InputLabel, MenuItem, Modal, Select, SelectChangeEvent, Typography} from "@mui/material";
+import { AlertColor, Box, Button, CircularProgress, Input, InputLabel, MenuItem, Modal, Select, SelectChangeEvent, Typography} from "@mui/material";
 import { useMutation , useQuery} from '@tanstack/react-query';
 import {createUser, fetchGroups } from "../utils/https.ts";
-import {useNavigate} from "react-router-dom";
-import {Dispatch, SetStateAction, useState} from "react";
+import {useState} from "react";
 import {useForm} from "react-hook-form";
 import {IGroup} from "../types/group.ts";
 import {ICreateUser} from "../types/user.ts";
 import {queryClient} from "../main.tsx";
 import {  modalStyle } from "../styles/mui-styles.ts";
+import ErrorPage from "../pages/error.tsx";
+import SimpleSnackbar from "./snackbar.tsx";
 
 
-interface IProps{
-    handleSnackOpen : Dispatch<SetStateAction<boolean>>;
-    handleSnackMessage : Dispatch<SetStateAction<string>>;
-    handleSnackType : Dispatch<SetStateAction<AlertColor>>;
-}
 
+export default  function AddUserComponent(){
+    
+    const [snack , setSnack] = useState(false)
 
-export default  function AddUserComponent(props : IProps){
-    const {data : groupsDatas, isLoading : isGroupsLoading , isError : isGroupsError} =  useQuery({
-        queryKey: ["groups"],
-        queryFn : fetchGroups,
-    })
+    const [snackType , setSnackType] = useState<AlertColor>("success") 
+
+    const [snackMessage, setSnackMessage] = useState("")
 
     const { register, handleSubmit , reset  } = useForm<ICreateUser>();
 
     const [show, setShow] = useState(false);
 
-    
+    const [role, setRole] = useState('');
 
-    const handleClose = () => {
-        reset()
-        setShow(false);
-    }
+    const [group, setGroup] = useState('');
+
+    const [isGroupDisabled , setIsGroupDisabled] = useState(true);
+    
+    const {data : groupsDatas, isLoading : isGroupsLoading , isError : isGroupsError ,error : groupsError} =  useQuery({
+        queryKey: ["groups"],
+        queryFn : fetchGroups,
+    })
 
     const { mutate , isError} = useMutation({
         mutationFn: createUser,
@@ -41,21 +42,19 @@ export default  function AddUserComponent(props : IProps){
                 queryKey: ["users"],
             });
             handleClose()
-            props.handleSnackMessage("Пользователь добавлен успешно")
-            props.handleSnackType("success")
-            props.handleSnackOpen(true)
+            setSnackMessage("Пользователь добавлен успешно")
+            setSnackType("success")
+            setSnack(true)
 
         }
     });
 
-    const navigate = useNavigate()
+    
 
-    const [role, setRole] = useState('');
-
-    const [group, setGroup] = useState('');
-
-    const [isGroupDisabled , setIsGroupDisabled] = useState(true);
-
+    const handleClose = () => {
+        reset()
+        setShow(false);
+    }
 
     const handleChangeRole = (event: SelectChangeEvent) => {
         setRole(event.target.value);
@@ -72,32 +71,34 @@ export default  function AddUserComponent(props : IProps){
         setGroup(event.target.value);
     };
 
-
-
-
     const onSubmit = (data :ICreateUser) => {
         mutate(data)
     };
 
     if (isGroupsLoading ) {
         return(
-            <p>Loading...</p>
+            <Box sx={{ display: 'flex' }}>
+                <CircularProgress />
+            </Box>
         )
     }
+
     if (isGroupsError){
-        navigate('/')
+        return(
+            <ErrorPage err={groupsError}/>
+        )
     }
 
     if(isError) {
         handleClose()
-        props.handleSnackMessage("Ошибка при создании пользователя")
-        props.handleSnackType("error")
-        props.handleSnackOpen(true)
+        setSnackMessage("Ошибка при создании пользователя")
+        setSnackType("error")
+        setSnack(true)
     }
-
 
     return (
         <>
+            <SimpleSnackbar show= {snack} handleOpen={setSnack} message={snackMessage} type={snackType}/>
             <Button sx={{
                 width:"fit-content"
             }} onClick={()=>{
@@ -112,7 +113,7 @@ export default  function AddUserComponent(props : IProps){
                 <Box sx={modalStyle}>
                     <form
                         onSubmit={handleSubmit(onSubmit)}
-                        className="border-2 p-10 rounded-lg flex flex-col gap-6">
+                        className="border-2 p-6 rounded-lg flex flex-col gap-6">
                         <Typography variant="h5" className="text-dark-bg">
                             Создать пользователя
                         </Typography>
