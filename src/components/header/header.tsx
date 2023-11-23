@@ -1,19 +1,17 @@
 import { Button, Container, Grid, Typography } from '@mui/material';
 import SchoolIcon from '@mui/icons-material/School';
 import { NavLink } from 'react-router-dom';
-import { useState } from 'react';
+import { memo, useState } from 'react';
 import ExitModal from '../modals/exitModal';
 import ExitToAppIcon from '@mui/icons-material/ExitToApp';
 import { useCookies } from 'react-cookie';
-export const Header = () => {
+export const Header = memo(() => {
+    const [exit, setExit] = useState(false);
 
-    const [exit , setExit] = useState(false)
-    
-    const [roleCookies] = useCookies(["role"]);
+    const [roleCookies] = useCookies(['role']);
 
-    const [nameCookies] = useCookies(["name"]);
+    const [nameCookies] = useCookies(['name']);
 
-    
     return (
         <header className="pt-5 pb-5 bg-dark-bg-meddium">
             <Container fixed>
@@ -47,14 +45,19 @@ export const Header = () => {
                         <Button
                             onClick={() => setExit(true)}
                             variant="contained"
-                            type ="button" 
+                            type="button"
                             className="text-white text-center">
-                            <ExitToAppIcon/>
+                            <ExitToAppIcon />
                         </Button>
                     </Grid>
                 </Grid>
             </Container>
-            {exit && <ExitModal show={exit} showHandler={setExit}/>}            
+            {exit && (
+                <ExitModal
+                    show={exit}
+                    showHandler={setExit}
+                />
+            )}
         </header>
     );
-};
+});

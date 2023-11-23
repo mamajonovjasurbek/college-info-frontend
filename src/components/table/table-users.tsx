@@ -15,17 +15,18 @@ import {
     TableContainer,
     TableHead,
     TableRow,
-    Button,
 } from '@mui/material';
 
 import Filter from '../filter.tsx';
 import { Pagination } from '../pagination.tsx';
 
 import { useMemo, useState } from 'react';
-import UserUpdateModal from '../modals/usersUpdateModal.tsx';
-import UsersDeleteModal from '../modals/usersDeleteModal.tsx';
 import { queryClient } from '../../main.tsx';
 import { tableCellStyle } from '../../styles/mui-styles.ts';
+import { UsersDeleteModal } from '../modals/usersDeleteModal.tsx';
+import { UserUpdateModal } from '../modals/usersUpdateModal.tsx';
+import { TableHeader } from './table-header.tsx';
+import { TableRowButton } from './row-button.tsx';
 
 function changeRoleToString(role: number | unknown) {
     if (role === 1) {
@@ -54,11 +55,11 @@ type Props = {
 export default function TableComponentUsers(props: Props) {
     const userData = useMemo(() => props.users, [props.users]);
 
-    const [showModal, setShowModal] = useState(false);
+    const [showModal, setShowModal] = useState<boolean>(false);
 
-    const [userID, setUserID] = useState('');
+    const [userID, setUserID] = useState<string>('');
 
-    const [deleteModal, setDeleteModal] = useState(false);
+    const [deleteModal, setDeleteModal] = useState<boolean>(false);
 
     const reloadTable = () => {
         queryClient.invalidateQueries({
@@ -97,23 +98,19 @@ export default function TableComponentUsers(props: Props) {
                 header: 'Редактирование',
                 cell: ({ row }) => (
                     <div className="flex items-center justify-center gap-2">
-                        <Button
-                            onClick={() => {
-                                setShowModal(true);
-                                setUserID(row.getValue('id'));
-                            }}
-                            variant="contained">
-                            Изменить
-                        </Button>
-                        <Button
+                        <TableRowButton
+                            name="Изменить"
+                            row={row}
+                            setShow={setShowModal}
+                            setID={setUserID}
+                        />
+                        <TableRowButton
+                            name="Удалить"
                             color="error"
-                            onClick={() => {
-                                setDeleteModal(true);
-                                setUserID(row.getValue('id'));
-                            }}
-                            variant="contained">
-                            Удалить
-                        </Button>
+                            row={row}
+                            setShow={setDeleteModal}
+                            setID={setUserID}
+                        />
                     </div>
                 ),
             },
@@ -142,40 +139,10 @@ export default function TableComponentUsers(props: Props) {
                 showHandler={setShowModal}
             />
             <div className="h-2" />
-            <span className="flex items-center gap-4 mb-4 text-dark-bg-text">
-                Перейти на страницу:
-                <input
-                    type="number"
-                    defaultValue={table.getState().pagination.pageIndex + 1}
-                    onChange={(e) => {
-                        const page = e.target.value
-                            ? Number(e.target.value) - 1
-                            : 0;
-                        table.setPageIndex(page);
-                    }}
-                    className="min-w-fit px-2  h-8 bg-dark-bg-lite  text-dark-bg"
-                />
-                <select
-                    className=" w-auto px-2 h-8 bg-dark-bg-lite text-dark-bg"
-                    value={table.getState().pagination.pageSize}
-                    onChange={(e) => {
-                        table.setPageSize(Number(e.target.value));
-                    }}>
-                    {[10, 20, 30, 40, 50].map((pageSize) => (
-                        <option
-                            key={pageSize}
-                            value={pageSize}>
-                            Показать: {pageSize}
-                        </option>
-                    ))}
-                </select>
-                <Button
-                    variant="contained"
-                    onClick={reloadTable}>
-                    Обновить таблицу
-                </Button>
-            </span>
-
+            <TableHeader
+                table={table}
+                reloadTable={reloadTable}
+            />
             <TableContainer
                 variant="outlined"
                 component={Paper}>

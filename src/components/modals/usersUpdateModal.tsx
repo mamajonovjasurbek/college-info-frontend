@@ -10,11 +10,11 @@ import {
     Typography,
 } from '@mui/material';
 import { useMutation } from '@tanstack/react-query';
-import { Dispatch, SetStateAction, useState } from 'react';
+import { Dispatch, SetStateAction, memo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { IUserPassword } from '../../types/user';
 import { updataUserByID } from '../../utils/https';
-import SimpleSnackbar from '../snackbar';
+import { SimpleSnackbar } from '../snackbar';
 
 interface IProps {
     show: boolean;
@@ -32,7 +32,7 @@ const style = {
     boxShadow: 24,
 };
 
-export default function UserUpdateModal(props: IProps) {
+export const UserUpdateModal = memo((props: IProps) => {
     const [same, setSame] = useState(true);
 
     const [snack, setSnack] = useState(false);
@@ -137,4 +137,4 @@ export default function UserUpdateModal(props: IProps) {
             </Modal>
         </>
     );
-}
+});

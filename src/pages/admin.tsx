@@ -1,10 +1,10 @@
 import TableComponentUsers from '../components/table/table-users.tsx';
 import { useQuery } from '@tanstack/react-query';
 import { getUsers } from '../utils/https.ts';
-import AddUserComponent from '../components/addUser.tsx';
 import { Typography } from '@mui/material';
 import ErrorPage from './error.tsx';
-import Loader from '../components/loader.tsx';
+import { AddUserComponent } from '../components/addUser.tsx';
+import { Loader } from '../components/loader.tsx';
 
 export default function Admin() {
     const {

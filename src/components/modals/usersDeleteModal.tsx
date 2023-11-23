@@ -8,10 +8,10 @@ import {
     Typography,
 } from '@mui/material';
 import { useMutation } from '@tanstack/react-query';
-import { Dispatch, SetStateAction, useState } from 'react';
+import { Dispatch, SetStateAction, memo, useState } from 'react';
 import { deleteUserById } from '../../utils/https';
 import { queryClient } from '../../main.tsx';
-import SimpleSnackbar from '../snackbar.tsx';
+import { SimpleSnackbar } from '../snackbar.tsx';
 
 interface IProps {
     show: boolean;
@@ -31,7 +31,7 @@ const style = {
     p: 4,
 };
 
-export default function UsersDeleteModal(props: IProps) {
+export const UsersDeleteModal = memo((props: IProps) => {
     const [snack, setSnack] = useState(false);
 
     const [snackType, setSnackType] = useState<AlertColor>('success');
@@ -108,4 +108,4 @@ export default function UsersDeleteModal(props: IProps) {
             </Modal>
         </>
     );
-}
+});

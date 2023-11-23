@@ -1,5 +1,4 @@
 import { useMemo, useState } from 'react';
-import IndeterminateCheckbox from '../selectionCheck.tsx';
 import { IBirthDate, IStudent } from '../../types/student.ts';
 import {
     ColumnDef,
@@ -17,7 +16,6 @@ import {
     TableContainer,
     TableHead,
     TableRow,
-    Button,
     AlertColor,
 } from '@mui/material';
 
@@ -27,8 +25,10 @@ import { tableCellStyle, tableHeaderStyle } from '../../styles/mui-styles.ts';
 import { queryClient } from '../../main.tsx';
 import { useMutation } from '@tanstack/react-query';
 import { postStudentsData } from '../../utils/https.ts';
-import SimpleSnackbar from '../snackbar.tsx';
-import Loader from '../loader.tsx';
+import { SimpleSnackbar } from '../snackbar.tsx';
+import { IndeterminateCheckbox } from '../selectionCheck.tsx';
+import { TableHeader } from './table-header.tsx';
+import { Loader } from '../loader.tsx';
 
 type Props = {
     data: IStudent[];
@@ -192,47 +192,11 @@ export default function TableComponentStudents(props: Props) {
                 <Loader />
             ) : (
                 <div className="mt-6">
-                    <span className="flex items-center gap-4 mb-4 text-dark-bg-text">
-                        Перейти на страницу:
-                        <input
-                            type="number"
-                            defaultValue={
-                                table.getState().pagination.pageIndex + 1
-                            }
-                            onChange={(e) => {
-                                const page = e.target.value
-                                    ? Number(e.target.value) - 1
-                                    : 0;
-                                table.setPageIndex(page);
-                            }}
-                            className="min-w-fit px-2  h-8 bg-dark-bg-lite  text-dark-bg"
-                        />
-                        <select
-                            className=" w-auto px-2 h-8 bg-dark-bg-lite text-dark-bg"
-                            value={table.getState().pagination.pageSize}
-                            onChange={(e) => {
-                                table.setPageSize(Number(e.target.value));
-                            }}>
-                            {[10, 20, 30, 40, 50].map((pageSize) => (
-                                <option
-                                    key={pageSize}
-                                    value={pageSize}>
-                                    Показать : {pageSize}
-                                </option>
-                            ))}
-                        </select>
-                        <Button
-                            variant="contained"
-                            onClick={handleRowSelectionData}>
-                            Скачать Excel
-                        </Button>
-                        <Button
-                            variant="contained"
-                            onClick={reloadTable}>
-                            Обновить таблицу
-                        </Button>
-                    </span>
-
+                    <TableHeader
+                        table={table}
+                        reloadTable={reloadTable}
+                        handleRowSelectionData={handleRowSelectionData}
+                    />
                     <TableContainer
                         variant="outlined"
                         component={Paper}>

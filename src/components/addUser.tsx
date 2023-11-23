@@ -1,26 +1,35 @@
-import { AlertColor, Box, Button, CircularProgress, Input, InputLabel, MenuItem, Modal, Select, SelectChangeEvent, Typography} from "@mui/material";
-import { useMutation , useQuery} from '@tanstack/react-query';
-import {createUser, fetchGroups } from "../utils/https.ts";
-import {useState} from "react";
-import {useForm} from "react-hook-form";
-import {IGroup} from "../types/group.ts";
-import {ICreateUser} from "../types/user.ts";
-import {queryClient} from "../main.tsx";
-import {  modalStyle } from "../styles/mui-styles.ts";
-import ErrorPage from "../pages/error.tsx";
-import SimpleSnackbar from "./snackbar.tsx";
+import {
+    AlertColor,
+    Box,
+    Button,
+    CircularProgress,
+    Input,
+    InputLabel,
+    MenuItem,
+    Modal,
+    Select,
+    SelectChangeEvent,
+    Typography,
+} from '@mui/material';
+import { useMutation, useQuery } from '@tanstack/react-query';
+import { createUser, fetchGroups } from '../utils/https.ts';
+import { memo, useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { IGroup } from '../types/group.ts';
+import { ICreateUser } from '../types/user.ts';
+import { queryClient } from '../main.tsx';
+import { modalStyle } from '../styles/mui-styles.ts';
+import ErrorPage from '../pages/error.tsx';
+import { SimpleSnackbar } from './snackbar.tsx';
 
+export const AddUserComponent = memo(() => {
+    const [snack, setSnack] = useState(false);
 
+    const [snackType, setSnackType] = useState<AlertColor>('success');
 
-export default  function AddUserComponent(){
-    
-    const [snack , setSnack] = useState(false)
+    const [snackMessage, setSnackMessage] = useState('');
 
-    const [snackType , setSnackType] = useState<AlertColor>("success") 
-
-    const [snackMessage, setSnackMessage] = useState("")
-
-    const { register, handleSubmit , reset  } = useForm<ICreateUser>();
+    const { register, handleSubmit, reset } = useForm<ICreateUser>();
 
     const [show, setShow] = useState(false);
 
@@ -28,42 +37,44 @@ export default  function AddUserComponent(){
 
     const [group, setGroup] = useState('');
 
-    const [isGroupDisabled , setIsGroupDisabled] = useState(true);
-    
-    const {data : groupsDatas, isLoading : isGroupsLoading , isError : isGroupsError ,error : groupsError} =  useQuery({
-        queryKey: ["groups"],
-        queryFn : fetchGroups,
-    })
+    const [isGroupDisabled, setIsGroupDisabled] = useState(true);
 
-    const { mutate , isError} = useMutation({
-        mutationFn: createUser,
-        onSuccess : () =>{
-            queryClient.invalidateQueries({
-                queryKey: ["users"],
-            });
-            handleClose()
-            setSnackMessage("Пользователь добавлен успешно")
-            setSnackType("success")
-            setSnack(true)
-
-        }
+    const {
+        data: groupsDatas,
+        isLoading: isGroupsLoading,
+        isError: isGroupsError,
+        error: groupsError,
+    } = useQuery({
+        queryKey: ['groups'],
+        queryFn: fetchGroups,
     });
 
-    
+    const { mutate, isError } = useMutation({
+        mutationFn: createUser,
+        onSuccess: () => {
+            queryClient.invalidateQueries({
+                queryKey: ['users'],
+            });
+            handleClose();
+            setSnackMessage('Пользователь добавлен успешно');
+            setSnackType('success');
+            setSnack(true);
+        },
+    });
 
     const handleClose = () => {
-        reset()
+        reset();
         setShow(false);
-    }
+    };
 
     const handleChangeRole = (event: SelectChangeEvent) => {
         setRole(event.target.value);
 
-        if (Number(event.target.value) === 3){
-            setIsGroupDisabled(false)
-        }else{
-            setGroup("")
-            setIsGroupDisabled(true)
+        if (Number(event.target.value) === 3) {
+            setIsGroupDisabled(false);
+        } else {
+            setGroup('');
+            setIsGroupDisabled(true);
         }
     };
 
@@ -71,39 +82,46 @@ export default  function AddUserComponent(){
         setGroup(event.target.value);
     };
 
-    const onSubmit = (data :ICreateUser) => {
-        mutate(data)
+    const onSubmit = (data: ICreateUser) => {
+        mutate(data);
     };
 
-    if (isGroupsLoading ) {
-        return(
+    if (isGroupsLoading) {
+        return (
             <Box sx={{ display: 'flex' }}>
                 <CircularProgress />
             </Box>
-        )
+        );
     }
 
-    if (isGroupsError){
-        return(
-            <ErrorPage err={groupsError}/>
-        )
+    if (isGroupsError) {
+        return <ErrorPage err={groupsError} />;
     }
 
-    if(isError) {
-        handleClose()
-        setSnackMessage("Ошибка при создании пользователя")
-        setSnackType("error")
-        setSnack(true)
+    if (isError) {
+        handleClose();
+        setSnackMessage('Ошибка при создании пользователя');
+        setSnackType('error');
+        setSnack(true);
     }
 
     return (
         <>
-            <SimpleSnackbar show= {snack} handleOpen={setSnack} message={snackMessage} type={snackType}/>
-            <Button sx={{
-                width:"fit-content"
-            }} onClick={()=>{
-                setShow(true)
-            }} variant="contained">Добавить пользователя
+            <SimpleSnackbar
+                show={snack}
+                handleOpen={setSnack}
+                message={snackMessage}
+                type={snackType}
+            />
+            <Button
+                sx={{
+                    width: 'fit-content',
+                }}
+                onClick={() => {
+                    setShow(true);
+                }}
+                variant="contained">
+                Добавить пользователя
             </Button>
             <Modal
                 open={show}
@@ -114,13 +132,12 @@ export default  function AddUserComponent(){
                     <form
                         onSubmit={handleSubmit(onSubmit)}
                         className="border-2 p-6 rounded-lg flex flex-col gap-6">
-                        <Typography variant="h5" className="text-dark-bg">
+                        <Typography
+                            variant="h5"
+                            className="text-dark-bg">
                             Создать пользователя
                         </Typography>
-                        <InputLabel
-                            htmlFor="login">
-                            Имя
-                        </InputLabel>
+                        <InputLabel htmlFor="login">Имя</InputLabel>
                         <Input
                             placeholder="Введите имя"
                             id="name"
@@ -157,8 +174,7 @@ export default  function AddUserComponent(){
                             value={role}
                             label="Роль"
                             {...register('role_id', { required: true })}
-                            onChange={handleChangeRole}
-                        >
+                            onChange={handleChangeRole}>
                             <MenuItem value="">
                                 <em>Не выбрано</em>
                             </MenuItem>
@@ -177,18 +193,20 @@ export default  function AddUserComponent(){
                             label="Группа"
                             {...register('group_id')}
                             onChange={handleChangeGroup}
-                            disabled={isGroupDisabled}
-                        >
+                            disabled={isGroupDisabled}>
                             <MenuItem value="">
                                 <em>Не выбрано</em>
                             </MenuItem>
-                            {groupsDatas.length && groupsDatas.map((item : IGroup) =>{
-                                return(
-                                    <MenuItem key={item.id} value={item.id}>
-                                        <em>{item.name}</em>
-                                    </MenuItem>
-                                )
-                            })}
+                            {groupsDatas.length &&
+                                groupsDatas.map((item: IGroup) => {
+                                    return (
+                                        <MenuItem
+                                            key={item.id}
+                                            value={item.id}>
+                                            <em>{item.name}</em>
+                                        </MenuItem>
+                                    );
+                                })}
                         </Select>
                         <Button
                             type="submit"
@@ -200,4 +218,4 @@ export default  function AddUserComponent(){
             </Modal>
         </>
     );
-}
+});

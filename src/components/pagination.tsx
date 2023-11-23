@@ -1,9 +1,19 @@
-// @ts-ignore
-export const Pagination = ({table}) =>{
-    return(
+import { Table } from '@tanstack/react-table';
+import { memo, useMemo } from 'react';
+import { IStudent } from '../types/student';
+import { IUser } from '../types/user';
+
+interface IProps {
+    table: Table<IStudent> | Table<IUser>;
+}
+
+export const Pagination = memo((props: IProps) => {
+    const table = useMemo(() => props.table, [props.table]);
+
+    return (
         <div className="flex items-center justify-center gap-2 mt-4 flex-col">
-               <div>
-               <button
+            <div>
+                <button
                     className="border rounded py-2 px-4 text-dark-bg bg-dark-bg-lite font-bold"
                     onClick={() => table.setPageIndex(0)}
                     disabled={!table.getCanPreviousPage()}>
@@ -27,17 +37,14 @@ export const Pagination = ({table}) =>{
                     disabled={!table.getCanNextPage()}>
                     {'>>'}
                 </button>
-               </div>
-                <span className="flex items-center gap-1 text-dark-bg-text">
-                    <div>Страница</div>
-                    <strong>
-                        {table.getState().pagination.pageIndex + 1} из{' '}
-                        {table.getPageCount()}
-                    </strong>
-                </span>
-                
             </div>
-    )
-}
-
-
+            <span className="flex items-center gap-1 text-dark-bg-text">
+                <div>Страница</div>
+                <strong>
+                    {table.getState().pagination.pageIndex + 1} из{' '}
+                    {table.getPageCount()}
+                </strong>
+            </span>
+        </div>
+    );
+});
