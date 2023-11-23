@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import IndeterminateCheckbox from '../selectionCheck.tsx';
-import { IStudent } from '../../types/student.ts';
+import { IBirthDate, IStudent } from '../../types/student.ts';
 import {
     ColumnDef,
     flexRender,
@@ -19,8 +19,6 @@ import {
     TableRow,
     Button,
     AlertColor,
-    CircularProgress,
-    Box,
 } from '@mui/material';
 
 import Filter from '../filter.tsx';
@@ -92,7 +90,7 @@ export default function TableComponentStudents(props: Props) {
             {
                 header: 'Дата рождения',
                 accessorKey: 'birth_date',
-                cell: (info) => info.getValue().String,
+                cell: (info) => info.getValue<IBirthDate>().String,
             },
             {
                 header: 'Место рождения',

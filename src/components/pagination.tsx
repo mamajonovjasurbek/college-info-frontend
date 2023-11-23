@@ -1,3 +1,4 @@
+// @ts-ignore
 export const Pagination = ({table}) =>{
     return(
         <div className="flex items-center justify-center gap-2 mt-4 flex-col">

@@ -13,7 +13,7 @@ interface IProps{
 export default function SimpleSnackbar(props : IProps) {
 
     const handleClose = (
-        event: SyntheticEvent | Event,
+        _event: SyntheticEvent | Event,
         reason?: string,
     ) => {
         if (reason === 'clickaway') {

@@ -34,15 +34,15 @@ const style = {
 
 export default function UserUpdateModal(props: IProps) {
     const [same, setSame] = useState(true);
-    
+
     const [snack, setSnack] = useState(false);
-    
+
     const [snackType, setSnackType] = useState<AlertColor>('success');
-    
+
     const [snackMessage, setSnackMessage] = useState('');
-    
+
     const { register, handleSubmit } = useForm<IUserPassword>();
-    
+
     const { mutate, isError, isPending } = useMutation({
         mutationFn: updataUserByID,
         onSuccess: () => {
