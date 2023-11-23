@@ -30,6 +30,7 @@ import { queryClient } from '../../main.tsx';
 import { useMutation } from '@tanstack/react-query';
 import { postStudentsData } from '../../utils/https.ts';
 import SimpleSnackbar from '../snackbar.tsx';
+import Loader from '../loader.tsx';
 
 type Props = {
     data: IStudent[];
@@ -44,12 +45,16 @@ export default function TableComponentStudents(props: Props) {
 
     const [snackMessage, setSnackMessage] = useState('');
 
-    const data = useMemo(() => props.data, [props.data]);
-
     const { mutate, isPending, isError } = useMutation({
         mutationFn: postStudentsData,
+        onSuccess: () => {
+            setSnackMessage('Excel файл успешно создан');
+            setSnackType('success');
+            setSnack(true);
+        },
     });
 
+    const data = useMemo(() => props.data, [props.data]);
 
     const columns = useMemo<ColumnDef<IStudent>[]>(
         () => [
@@ -77,12 +82,13 @@ export default function TableComponentStudents(props: Props) {
                     </div>
                 ),
             },
-        
+
             {
                 header: 'ФИШ',
                 accessorKey: 'name',
                 cell: (info) => info.getValue(),
             },
+
             {
                 header: 'Дата рождения',
                 accessorKey: 'birth_date',
@@ -118,7 +124,7 @@ export default function TableComponentStudents(props: Props) {
                 accessorKey: 'course',
                 cell: (info) => info.getValue(),
             },
-        
+
             {
                 header: 'Отец',
                 accessorKey: 'father',
@@ -129,14 +135,15 @@ export default function TableComponentStudents(props: Props) {
                 accessorKey: 'mother',
                 cell: (info) => info.getValue(),
             },
-        
+
             {
                 header: 'Группа',
                 accessorKey: 'group',
                 cell: (info) => info.getValue(),
             },
-        ] , []
-    )
+        ],
+        [],
+    );
 
     const table = useReactTable({
         data,
@@ -170,7 +177,7 @@ export default function TableComponentStudents(props: Props) {
     };
 
     if (isError) {
-        setSnackMessage('Ошибка при удалении пользователя');
+        setSnackMessage('Ошибка при содании excel файла');
         setSnackType('error');
         setSnack(true);
     }
@@ -184,11 +191,9 @@ export default function TableComponentStudents(props: Props) {
                 type={snackType}
             />
             {isPending ? (
-                <Box sx={{ display: 'flex' }}>
-                    <CircularProgress />
-                </Box>
+                <Loader />
             ) : (
-                <div className='mt-6'>
+                <div className="mt-6">
                     <span className="flex items-center gap-4 mb-4 text-dark-bg-text">
                         Перейти на страницу:
                         <input
