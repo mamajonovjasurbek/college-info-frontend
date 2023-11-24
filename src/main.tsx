@@ -6,7 +6,7 @@ import Home from './pages/home.tsx';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Auth } from './pages/auth.tsx';
 import Admin from './pages/admin.tsx';
-const router = createBrowserRouter([
+export const router = createBrowserRouter([
     {
         path: '/home',
         element: <Root />,

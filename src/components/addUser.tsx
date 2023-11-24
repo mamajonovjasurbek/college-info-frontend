@@ -21,8 +21,11 @@ import { queryClient } from '../main.tsx';
 import { modalStyle } from '../styles/mui-styles.ts';
 import ErrorPage from '../pages/error.tsx';
 import { SimpleSnackbar } from './snackbar.tsx';
+import { useNavigate } from 'react-router-dom';
 
 export const AddUserComponent = memo(() => {
+    const navigate = useNavigate();
+
     const [snack, setSnack] = useState(false);
 
     const [snackType, setSnackType] = useState<AlertColor>('success');
@@ -49,7 +52,7 @@ export const AddUserComponent = memo(() => {
         queryFn: fetchGroups,
     });
 
-    const { mutate, isError } = useMutation({
+    const { mutate, isError, error } = useMutation({
         mutationFn: createUser,
         onSuccess: () => {
             queryClient.invalidateQueries({
@@ -95,10 +98,16 @@ export const AddUserComponent = memo(() => {
     }
 
     if (isGroupsError) {
+        if (groupsError?.response?.status === 401) {
+            navigate('/');
+        }
         return <ErrorPage err={groupsError} />;
     }
 
     if (isError) {
+        if (error?.response?.status === 401) {
+            navigate('/');
+        }
         handleClose();
         setSnackMessage('Ошибка при создании пользователя');
         setSnackType('error');

@@ -5,13 +5,17 @@ import { Typography } from '@mui/material';
 import ErrorPage from './error.tsx';
 import { AddUserComponent } from '../components/addUser.tsx';
 import { Loader } from '../components/loader.tsx';
+import { useNavigate } from 'react-router-dom';
 
 export default function Admin() {
+    const navigate = useNavigate();
+
     const {
         data: usersDatas,
         isLoading: isUsersLoading,
         isError: isUsersError,
         error: usersError,
+        status,
     } = useQuery({
         queryKey: ['users'],
         queryFn: getUsers,
@@ -20,8 +24,11 @@ export default function Admin() {
     if (isUsersLoading) {
         return <Loader />;
     }
+    console.log(status);
 
     if (isUsersError) {
+        console.log(usersError);
+
         return <ErrorPage err={usersError} />;
     }
 

@@ -15,6 +15,7 @@ import { useForm } from 'react-hook-form';
 import { IUserPassword } from '../../types/user';
 import { updataUserByID } from '../../utils/https';
 import { SimpleSnackbar } from '../snackbar';
+import { useNavigate } from 'react-router-dom';
 
 interface IProps {
     show: boolean;
@@ -33,6 +34,8 @@ const style = {
 };
 
 export const UserUpdateModal = memo((props: IProps) => {
+    const navigate = useNavigate();
+
     const [same, setSame] = useState(true);
 
     const [snack, setSnack] = useState(false);
@@ -43,7 +46,7 @@ export const UserUpdateModal = memo((props: IProps) => {
 
     const { register, handleSubmit } = useForm<IUserPassword>();
 
-    const { mutate, isError, isPending } = useMutation({
+    const { mutate, isError, isPending, error } = useMutation({
         mutationFn: updataUserByID,
         onSuccess: () => {
             handleClose();
@@ -66,6 +69,9 @@ export const UserUpdateModal = memo((props: IProps) => {
     };
 
     if (isError) {
+        if (error?.response?.status === 401) {
+            navigate('/');
+        }
         handleClose();
         setSnackMessage('Ошибка при изменении пароля пользователя');
         setSnackType('error');

@@ -29,12 +29,18 @@ import { SimpleSnackbar } from '../snackbar.tsx';
 import { IndeterminateCheckbox } from '../selectionCheck.tsx';
 import { TableHeader } from './table-header.tsx';
 import { Loader } from '../loader.tsx';
+import { TableRowButton } from './row-button.tsx';
+import { StudentUpdateModal } from '../modals/studentUpdateModal.tsx';
+import { StudentDeleteModal } from '../modals/studentDeleteModal.tsx';
+import { useNavigate } from 'react-router-dom';
 
 type Props = {
     data: IStudent[];
 };
 
 export default function TableComponentStudents(props: Props) {
+    const navigate = useNavigate();
+
     const [rowSelection, setRowSelection] = useState({});
 
     const [snack, setSnack] = useState(false);
@@ -43,7 +49,15 @@ export default function TableComponentStudents(props: Props) {
 
     const [snackMessage, setSnackMessage] = useState('');
 
-    const { mutate, isPending, isError } = useMutation({
+    const [showModal, setShowModal] = useState<boolean>(false);
+
+    const [studentID, setStudentID] = useState<string>('');
+
+    const [makeQuery, setMakeQuery] = useState(false);
+
+    const [deleteModal, setDeleteModal] = useState<boolean>(false);
+
+    const { mutate, isPending, isError, error } = useMutation({
         mutationFn: postStudentsData,
         onSuccess: () => {
             setSnackMessage('Excel файл успешно создан');
@@ -61,9 +75,10 @@ export default function TableComponentStudents(props: Props) {
                 header: ({ table }) => (
                     <IndeterminateCheckbox
                         {...{
-                            checked: table.getIsAllRowsSelected(),
+                            checked: table.getIsAllPageRowsSelected(),
                             indeterminate: table.getIsSomeRowsSelected(),
-                            onChange: table.getToggleAllRowsSelectedHandler(),
+                            onChange:
+                                table.getToggleAllPageRowsSelectedHandler(),
                         }}
                     />
                 ),
@@ -81,6 +96,11 @@ export default function TableComponentStudents(props: Props) {
                 ),
             },
 
+            {
+                header: 'Идентификатор',
+                accessorKey: 'id',
+                cell: (info) => info.getValue(),
+            },
             {
                 header: 'ФИШ',
                 accessorKey: 'name',
@@ -139,6 +159,27 @@ export default function TableComponentStudents(props: Props) {
                 accessorKey: 'group',
                 cell: (info) => info.getValue(),
             },
+            {
+                header: 'Редактирование',
+                cell: ({ row }) => (
+                    <div className="flex items-center justify-center gap-2">
+                        <TableRowButton
+                            name="Изменить"
+                            row={row}
+                            setShow={setShowModal}
+                            setID={setStudentID}
+                            makeQuery={setMakeQuery}
+                        />
+                        <TableRowButton
+                            name="Удалить"
+                            color="error"
+                            row={row}
+                            setShow={setDeleteModal}
+                            setID={setStudentID}
+                        />
+                    </div>
+                ),
+            },
         ],
         [],
     );
@@ -175,11 +216,19 @@ export default function TableComponentStudents(props: Props) {
     };
 
     if (isError) {
+        if (error?.response?.status === 401) {
+            navigate('/');
+        }
         setSnackMessage('Ошибка при содании excel файла');
         setSnackType('error');
         setSnack(true);
     }
 
+    // interface IProps {
+    //     show: boolean;
+    //     id: string;
+    //     showHandler: Dispatch<SetStateAction<boolean>>;
+    // }
     return (
         <div>
             <SimpleSnackbar
@@ -187,6 +236,17 @@ export default function TableComponentStudents(props: Props) {
                 handleOpen={setSnack}
                 message={snackMessage}
                 type={snackType}
+            />
+            <StudentUpdateModal
+                show={showModal}
+                id={studentID}
+                showHandler={setShowModal}
+                makeQuery={makeQuery}
+            />
+            <StudentDeleteModal
+                show={deleteModal}
+                id={studentID}
+                showHandler={setDeleteModal}
             />
             {isPending ? (
                 <Loader />

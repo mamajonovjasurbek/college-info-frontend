@@ -10,6 +10,7 @@ interface IProps {
     row: Row<IStudent> | Row<IUser>;
     setID: Dispatch<SetStateAction<string>>;
     name: string;
+    makeQuery?: Dispatch<SetStateAction<boolean>>;
     color?: OverridableStringUnion<
         | 'inherit'
         | 'primary'
@@ -28,6 +29,9 @@ export const TableRowButton = memo((props: IProps) => {
             onClick={() => {
                 props.setShow(true);
                 props.setID(props.row.getValue('id'));
+                {
+                    props.makeQuery && props.makeQuery(true);
+                }
             }}
             variant="contained">
             {props.name}

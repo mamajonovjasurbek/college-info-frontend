@@ -1,5 +1,5 @@
 import { Table } from '@tanstack/react-table';
-import { memo, useMemo } from 'react';
+import { useMemo } from 'react';
 import { IStudent } from '../types/student';
 import { IUser } from '../types/user';
 
@@ -7,7 +7,7 @@ interface IProps {
     table: Table<IStudent> | Table<IUser>;
 }
 
-export const Pagination = memo((props: IProps) => {
+export const Pagination = (props: IProps) => {
     const table = useMemo(() => props.table, [props.table]);
 
     return (
@@ -47,4 +47,4 @@ export const Pagination = memo((props: IProps) => {
             </span>
         </div>
     );
-});
+};

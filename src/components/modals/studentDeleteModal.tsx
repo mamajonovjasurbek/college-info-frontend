@@ -9,7 +9,7 @@ import {
 } from '@mui/material';
 import { useMutation } from '@tanstack/react-query';
 import { Dispatch, SetStateAction, memo, useState } from 'react';
-import { deleteUserById } from '../../utils/https';
+import { deleteStudentByID } from '../../utils/https';
 import { queryClient } from '../../main.tsx';
 import { SimpleSnackbar } from '../snackbar.tsx';
 import { useNavigate } from 'react-router-dom';
@@ -32,7 +32,7 @@ const style = {
     p: 4,
 };
 
-export const UsersDeleteModal = memo((props: IProps) => {
+export const StudentDeleteModal = memo((props: IProps) => {
     const navigate = useNavigate();
 
     const [snack, setSnack] = useState(false);
@@ -42,13 +42,13 @@ export const UsersDeleteModal = memo((props: IProps) => {
     const [snackMessage, setSnackMessage] = useState('');
 
     const { mutate, isError, isPending, error } = useMutation({
-        mutationFn: deleteUserById,
+        mutationFn: deleteStudentByID,
         onSuccess: () => {
             queryClient.invalidateQueries({
-                queryKey: ['users'],
+                queryKey: ['students'],
             });
             handleClose();
-            setSnackMessage('Пользователь удален успешно');
+            setSnackMessage('Студент удален успешно');
             setSnackType('success');
             setSnack(true);
         },
@@ -57,7 +57,6 @@ export const UsersDeleteModal = memo((props: IProps) => {
     const handleClose = () => props.showHandler(false);
 
     const deleteHandler = () => {
-        console.log(props.id);
         mutate(props.id);
     };
 
@@ -66,7 +65,7 @@ export const UsersDeleteModal = memo((props: IProps) => {
             navigate('/');
         }
         handleClose();
-        setSnackMessage('Ошибка при удалении пользователя');
+        setSnackMessage('Ошибка при удалении студента');
         setSnackType('error');
         setSnack(true);
     }
@@ -93,7 +92,7 @@ export const UsersDeleteModal = memo((props: IProps) => {
                         <Typography
                             variant="h5"
                             className="text-dark-bg text-center">
-                            Удалить пользователя
+                            Удалить студента
                         </Typography>
 
                         <div className="flex gap-2 justify-center mt-4">

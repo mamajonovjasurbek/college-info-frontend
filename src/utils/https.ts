@@ -2,7 +2,7 @@ import Cookies from 'universal-cookie';
 import { IStudent } from '../types/student';
 import { ICreateUser, IUser } from '../types/user';
 import { saveAs } from 'file-saver';
-import axios from "axios";
+import axios from 'axios';
 
 const instance = axios.create({
     baseURL: 'http://localhost:5000/',
@@ -36,6 +36,10 @@ export async function getStudents() {
             Authorization: `Bearer ${token}`,
         },
     });
+
+    if (response.status == 401) {
+        throw new Error('auth');
+    }
 
     return response.data;
 }
@@ -123,4 +127,59 @@ export async function postStudentsData(data: IStudent[]) {
         // @ts-ignore
         saveAs(result.data, 'result.xlsx');
     });
+}
+
+export async function deleteStudentByID(id: string) {
+    const cookies = new Cookies();
+    const token = cookies.get('Authorization');
+
+    const response = await instance({
+        method: 'delete',
+        url: '/students/' + id,
+        headers: {
+            Authorization: `Bearer ${token}`,
+        },
+    });
+
+    return response.data;
+}
+
+// @ts-ignore
+export async function updataStudentByID({ id, data }) {
+    const cookies = new Cookies();
+    const token = cookies.get('Authorization');
+
+    console.log(data);
+    const response = await instance({
+        method: 'put',
+        url: '/students/' + id,
+        data: {
+            location: data.location,
+            pass_number: data.pass_number,
+            phone_number: data.phone_number,
+            study_dir: data.study_dir,
+            course: data.course,
+            group: data.group,
+        },
+        headers: {
+            Authorization: `Bearer ${token}`,
+        },
+    });
+
+    return response.data;
+}
+
+export async function getStudentByID(id: string) {
+    const cookies = new Cookies();
+    const token = cookies.get('Authorization');
+
+    const response = await instance({
+        method: 'get',
+        url: '/students/' + id,
+        headers: {
+            Authorization: `Bearer ${token}`,
+        },
+    });
+
+    return response.data;
 }
