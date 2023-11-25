@@ -3,11 +3,9 @@ import { useQuery } from '@tanstack/react-query';
 import { getStudents } from '../utils/https.ts';
 import { Box, CircularProgress, Typography } from '@mui/material';
 import ErrorPage from './error.tsx';
-import { useNavigate } from 'react-router-dom';
+import { AddStudent } from '../components/addStudent.tsx';
 
 export default function Home() {
-    const navigate = useNavigate();
-
     const {
         data: datas,
         isLoading,
@@ -27,9 +25,6 @@ export default function Home() {
     }
 
     if (isError) {
-        if (error?.response?.status === 401) {
-            navigate('/');
-        }
         return <ErrorPage err={error} />;
     }
 
@@ -43,5 +38,10 @@ export default function Home() {
         );
     }
 
-    return <TableComponentStudents data={datas} />;
+    return (
+        <>
+            <AddStudent />
+            <TableComponentStudents data={datas} />
+        </>
+    );
 }

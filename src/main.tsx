@@ -29,7 +29,16 @@ export const router = createBrowserRouter([
     },
 ]);
 
-export const queryClient = new QueryClient();
+export const queryClient = new QueryClient({
+    defaultOptions: {
+        queries: {
+            refetchOnWindowFocus: false,
+            refetchOnReconnect: false,
+            retry: 1,
+            staleTime: 5 * 1000,
+        },
+    },
+});
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
     <QueryClientProvider client={queryClient}>

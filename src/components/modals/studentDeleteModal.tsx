@@ -12,7 +12,6 @@ import { Dispatch, SetStateAction, memo, useState } from 'react';
 import { deleteStudentByID } from '../../utils/https';
 import { queryClient } from '../../main.tsx';
 import { SimpleSnackbar } from '../snackbar.tsx';
-import { useNavigate } from 'react-router-dom';
 
 interface IProps {
     show: boolean;
@@ -33,8 +32,6 @@ const style = {
 };
 
 export const StudentDeleteModal = memo((props: IProps) => {
-    const navigate = useNavigate();
-
     const [snack, setSnack] = useState(false);
 
     const [snackType, setSnackType] = useState<AlertColor>('success');
@@ -61,9 +58,6 @@ export const StudentDeleteModal = memo((props: IProps) => {
     };
 
     if (isError) {
-        if (error?.response?.status === 401) {
-            navigate('/');
-        }
         handleClose();
         setSnackMessage('Ошибка при удалении студента');
         setSnackType('error');

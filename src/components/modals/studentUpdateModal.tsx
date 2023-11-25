@@ -24,7 +24,6 @@ import { SimpleSnackbar } from '../snackbar';
 import { IStudent } from '../../types/student';
 import { IGroup } from '../../types/group';
 import { queryClient } from '../../main';
-import { useNavigate } from 'react-router-dom';
 
 interface IProps {
     show: boolean;
@@ -44,8 +43,6 @@ const style = {
 };
 
 export const StudentUpdateModal = memo((props: IProps) => {
-    const navigate = useNavigate();
-
     const {
         data: studentData,
         isLoading: isGetStudentLoading,
@@ -110,13 +107,6 @@ export const StudentUpdateModal = memo((props: IProps) => {
     };
 
     if (isError || isGetStudentError || isGroupsError) {
-        if (
-            groupError?.response?.status === 401 ||
-            studentError?.response?.status === 401 ||
-            error?.response?.status === 401
-        ) {
-            navigate('/');
-        }
         handleClose();
         setSnackMessage('Ошибка при изменении данных студента');
         setSnackType('error');

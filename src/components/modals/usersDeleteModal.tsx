@@ -12,7 +12,6 @@ import { Dispatch, SetStateAction, memo, useState } from 'react';
 import { deleteUserById } from '../../utils/https';
 import { queryClient } from '../../main.tsx';
 import { SimpleSnackbar } from '../snackbar.tsx';
-import { useNavigate } from 'react-router-dom';
 
 interface IProps {
     show: boolean;
@@ -33,15 +32,13 @@ const style = {
 };
 
 export const UsersDeleteModal = memo((props: IProps) => {
-    const navigate = useNavigate();
-
     const [snack, setSnack] = useState(false);
 
     const [snackType, setSnackType] = useState<AlertColor>('success');
 
     const [snackMessage, setSnackMessage] = useState('');
 
-    const { mutate, isError, isPending, error } = useMutation({
+    const { mutate, isError, isPending } = useMutation({
         mutationFn: deleteUserById,
         onSuccess: () => {
             queryClient.invalidateQueries({
@@ -62,9 +59,6 @@ export const UsersDeleteModal = memo((props: IProps) => {
     };
 
     if (isError) {
-        if (error?.response?.status === 401) {
-            navigate('/');
-        }
         handleClose();
         setSnackMessage('Ошибка при удалении пользователя');
         setSnackType('error');

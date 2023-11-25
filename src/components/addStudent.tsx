@@ -5,24 +5,20 @@ import {
     CircularProgress,
     Input,
     InputLabel,
-    MenuItem,
     Modal,
     Select,
     SelectChangeEvent,
     Typography,
 } from '@mui/material';
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { createUser, fetchGroups } from '../utils/https.ts';
 import { memo, useState } from 'react';
+import { ICreateUser } from '../types/user';
 import { useForm } from 'react-hook-form';
-import { IGroup } from '../types/group.ts';
-import { ICreateUser } from '../types/user.ts';
-import { queryClient } from '../main.tsx';
-import { modalStyle } from '../styles/mui-styles.ts';
-import ErrorPage from '../pages/error.tsx';
-import { SimpleSnackbar } from './snackbar.tsx';
+import ErrorPage from '../pages/error';
+import { SimpleSnackbar } from './snackbar';
+import { fetchGroups } from '../utils/https';
 
-export const AddUserComponent = memo(() => {
+export const AddStudent = memo(() => {
     const [snack, setSnack] = useState(false);
 
     const [snackType, setSnackType] = useState<AlertColor>('success');

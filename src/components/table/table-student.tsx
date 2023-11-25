@@ -32,15 +32,12 @@ import { Loader } from '../loader.tsx';
 import { TableRowButton } from './row-button.tsx';
 import { StudentUpdateModal } from '../modals/studentUpdateModal.tsx';
 import { StudentDeleteModal } from '../modals/studentDeleteModal.tsx';
-import { useNavigate } from 'react-router-dom';
 
 type Props = {
     data: IStudent[];
 };
 
 export default function TableComponentStudents(props: Props) {
-    const navigate = useNavigate();
-
     const [rowSelection, setRowSelection] = useState({});
 
     const [snack, setSnack] = useState(false);
@@ -216,9 +213,6 @@ export default function TableComponentStudents(props: Props) {
     };
 
     if (isError) {
-        if (error?.response?.status === 401) {
-            navigate('/');
-        }
         setSnackMessage('Ошибка при содании excel файла');
         setSnackType('error');
         setSnack(true);

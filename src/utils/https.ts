@@ -8,6 +8,26 @@ const instance = axios.create({
     baseURL: 'http://localhost:5000/',
 });
 
+instance.interceptors.response.use(
+    (response) => {
+        return response;
+    },
+    async (error) => {
+        if (401 === error.response.status) {
+            const cookies = new Cookies();
+            cookies.remove('Authorization', { sameSite: 'none', secure: true });
+
+            cookies.remove('role', { sameSite: 'none', secure: true });
+
+            cookies.remove('name', { sameSite: 'none', secure: true });
+
+            alert('Ошибка при аутентификации , залогинитесь снова пожалуйста');
+            window.location.replace('/');
+        }
+        return Promise.reject(error);
+    },
+);
+
 // @ts-ignore
 export async function updataUserByID({ id, data }) {
     const cookies = new Cookies();
