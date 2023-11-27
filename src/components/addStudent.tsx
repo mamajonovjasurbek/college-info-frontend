@@ -2,35 +2,48 @@ import {
     AlertColor,
     Box,
     Button,
-    CircularProgress, Grid, Input,
-    InputLabel, MenuItem,
+    CircularProgress,
+    Grid,
+    Input,
+    InputLabel,
+    MenuItem,
     Modal,
     Select,
-    SelectChangeEvent, TextField,
+    SelectChangeEvent,
+    TextField,
     Typography,
 } from '@mui/material';
 import { useMutation, useQuery } from '@tanstack/react-query';
-import {ChangeEvent, memo, useState , useMemo} from 'react';
+import { ChangeEvent, memo, useState, useMemo, useCallback } from 'react';
 import { useForm } from 'react-hook-form';
 import ErrorPage from '../pages/error';
 import { SimpleSnackbar } from './snackbar';
-import {createStudent, fetchGroups} from '../utils/https';
-import {IStudent} from "../types/student.ts";
-import {IGroup} from "../types/group.ts";
-import {modalStyle} from "../styles/mui-styles.ts";
-import  "../utils/date.css"
+import { createStudent, fetchGroups } from '../utils/https';
+import { IStudent } from '../types/student.ts';
+import { IGroup } from '../types/group.ts';
+import { modalStyle } from '../styles/mui-styles.ts';
+import '../utils/date.css';
 import { queryClient } from '../main.tsx';
 import Cookies from 'universal-cookie';
+import { useDropzone } from 'react-dropzone';
+import {
+    DropzoneText,
+    FileName,
+    ImagePreview,
+    dropzoneStyle,
+    activeDropzoneStyle,
+} from '../styles/drag-and-drop.ts';
 
 export const AddStudent = memo(() => {
+    const cookies = new Cookies();
 
-    const cookies = new Cookies() ;
+    const groupCookie = cookies.get('group');
 
-    const groupCookie = cookies.get('group')
-
-    const groupIDCookie = cookies.get('groupID')
+    const groupIDCookie = cookies.get('groupID');
 
     const { register, handleSubmit, reset } = useForm<IStudent>();
+
+    const [files, setFiles] = useState([]);
 
     const [snack, setSnack] = useState(false);
 
@@ -42,26 +55,28 @@ export const AddStudent = memo(() => {
 
     const [group, setGroup] = useState('');
 
-    const [date, setDate] = useState<string | null>("");
+    const [date, setDate] = useState<string | null>('');
 
-    const [isGroupEnabled , setIsGroupEnabled] = useState(false)
+    const [isGroupEnabled, setIsGroupEnabled] = useState(false);
 
-    const defaultValues = useMemo<IStudent>(() => { return {
-        name : "",
-        birth_date : {
-            String : "",
-            Valid : false
-        },
-        location : "",
-        pass_number : "",
-        pinfl : "",
-        phone_number : "",
-        study_dir : "",
-        course : "",
-        father : "",
-        mother : "",
-        group : "",
-    } } , []);
+    const defaultValues = useMemo<IStudent>(() => {
+        return {
+            name: '',
+            birth_date: {
+                String: '',
+                Valid: false,
+            },
+            location: '',
+            pass_number: '',
+            pinfl: '',
+            phone_number: '',
+            study_dir: '',
+            course: '',
+            father: '',
+            mother: '',
+            group: '',
+        };
+    }, []);
 
     const {
         data: groupsDatas,
@@ -71,15 +86,17 @@ export const AddStudent = memo(() => {
     } = useQuery({
         queryKey: ['groups'],
         queryFn: fetchGroups,
-        enabled : isGroupEnabled && groupCookie == "admin" as string
+        enabled: isGroupEnabled && groupCookie == ('admin' as string),
     });
 
-    const { mutate, isError , isPending } = useMutation({
+    const { mutate, isError, isPending } = useMutation({
         mutationFn: createStudent,
         onSuccess: () => {
-            queryClient.invalidateQueries({
-                queryKey: ['students'],
-            }).then(r => console.log(r));
+            queryClient
+                .invalidateQueries({
+                    queryKey: ['students'],
+                })
+                .then((r) => console.log(r));
             handleClose();
             setSnackMessage('Студент добавлен успешно');
             setSnackType('success');
@@ -87,47 +104,69 @@ export const AddStudent = memo(() => {
         },
     });
 
+    const onDrop = useCallback((acceptedFiles) => {
+        setFiles(
+            acceptedFiles.map((file) =>
+                Object.assign(file, {
+                    preview: URL.createObjectURL(file),
+                }),
+            ),
+        );
+    }, []);
+
+    const { getRootProps, getInputProps, isDragActive } = useDropzone({
+        onDrop,
+        accept: {
+            'image/*': ['.jpeg', '.jpg', '.png'],
+        },
+        maxSize: 1024 * 1024 * 5,
+        maxFiles: 1,
+    });
+
+    const fileList = files.map((file) => (
+        <li key={file.name}>
+            <img
+                style={ImagePreview}
+                src={file.preview}
+                alt={file.name}
+            />
+            <span style={FileName}>{file.name}</span>
+        </li>
+    ));
+
     const handleClose = () => {
         reset(defaultValues);
-        setGroup("")
+        setGroup('');
         setShow(false);
     };
 
-    const handleDate = (e: ChangeEvent<HTMLInputElement>) =>{
-        setDate(e.target.value)
-    }
-
+    const handleDate = (e: ChangeEvent<HTMLInputElement>) => {
+        setDate(e.target.value);
+    };
 
     const handleChangeGroup = (event: SelectChangeEvent) => {
         setGroup(event.target.value);
     };
-
     const onSubmit = (data: IStudent) => {
-        const isValid = date !== ""
-        const group : string = groupCookie != "admin" as string ? groupIDCookie as string : data.group
-        console.log(group);
-        const student:IStudent = {
-            name : data.name,
-            birth_date : {
-                String : date,
-                Valid : isValid
-            },
-            location : data.location,
-            pass_number : data.pass_number,
-            pinfl : data.pinfl,
-            phone_number : data.phone_number,
-            study_dir : data.study_dir,
-            course : data.course,
-            father : data.father,
-            mother : data.mother,
-            group : group
+        const formData = new FormData();
+        const group: string =
+            groupCookie != ('admin' as string)
+                ? (groupIDCookie as string)
+                : data.group;
 
-        }
+        formData.append('name', data.name);
+        formData.append('birth_date', data.birth_date.String as string);
+        formData.append('location', data.location);
+        formData.append('pass_number', data.pass_number);
+        formData.append('pinfl', data.pinfl);
+        formData.append('study_dir', data.study_dir);
+        formData.append('course', data.course);
+        formData.append('father', data.father);
+        formData.append('mother', data.mother);
+        formData.append('group', group);
 
-        // console.log(student)
-        mutate(student);
+        mutate(formData);
     };
-
 
     if (isGroupsError) {
         return <ErrorPage err={groupsError} />;
@@ -154,7 +193,7 @@ export const AddStudent = memo(() => {
                 }}
                 onClick={() => {
                     setShow(true);
-                    setIsGroupEnabled(true)
+                    setIsGroupEnabled(true);
                 }}
                 variant="contained">
                 Добавить студента
@@ -169,7 +208,7 @@ export const AddStudent = memo(() => {
                     <Box sx={{ display: 'flex' }}>
                         <CircularProgress />
                     </Box>
-                ):(
+                ) : (
                     <Box sx={modalStyle}>
                         <form
                             onSubmit={handleSubmit(onSubmit)}
@@ -179,8 +218,12 @@ export const AddStudent = memo(() => {
                                 className="text-dark-bg">
                                 Создать студента
                             </Typography>
-                            <Grid container spacing={2}>
-                                <Grid item xs={6}>
+                            <Grid
+                                container
+                                spacing={2}>
+                                <Grid
+                                    item
+                                    xs={6}>
                                     <InputLabel htmlFor="name">Имя</InputLabel>
                                     <TextField
                                         variant="outlined"
@@ -188,10 +231,14 @@ export const AddStudent = memo(() => {
                                         required
                                         placeholder="Введите имя"
                                         id="name"
-                                        {...register('name', { required: true })}
+                                        {...register('name', {
+                                            required: true,
+                                        })}
                                     />
                                 </Grid>
-                                <Grid item xs={6}>
+                                <Grid
+                                    item
+                                    xs={6}>
                                     <InputLabel
                                         className="text-sky-500"
                                         htmlFor="location">
@@ -205,7 +252,9 @@ export const AddStudent = memo(() => {
                                         {...register('location')}
                                     />
                                 </Grid>
-                                <Grid item xs={6}>
+                                <Grid
+                                    item
+                                    xs={6}>
                                     <InputLabel
                                         className="text-sky-500"
                                         htmlFor="pass_number">
@@ -219,7 +268,9 @@ export const AddStudent = memo(() => {
                                         {...register('pass_number')}
                                     />
                                 </Grid>
-                                <Grid item xs={6}>
+                                <Grid
+                                    item
+                                    xs={6}>
                                     <InputLabel
                                         className="text-sky-500"
                                         htmlFor="pinfl">
@@ -234,7 +285,9 @@ export const AddStudent = memo(() => {
                                     />
                                 </Grid>
 
-                                <Grid item xs={6}>
+                                <Grid
+                                    item
+                                    xs={6}>
                                     <InputLabel
                                         className="text-sky-500"
                                         htmlFor="phone_number">
@@ -248,7 +301,9 @@ export const AddStudent = memo(() => {
                                         {...register('phone_number')}
                                     />
                                 </Grid>
-                                <Grid item xs={6}>
+                                <Grid
+                                    item
+                                    xs={6}>
                                     <InputLabel
                                         className="text-sky-500"
                                         htmlFor="study_dir">
@@ -262,7 +317,9 @@ export const AddStudent = memo(() => {
                                         {...register('study_dir')}
                                     />
                                 </Grid>
-                                <Grid item xs={6}>
+                                <Grid
+                                    item
+                                    xs={6}>
                                     <InputLabel
                                         className="text-sky-500"
                                         htmlFor="course">
@@ -276,7 +333,9 @@ export const AddStudent = memo(() => {
                                         {...register('course')}
                                     />
                                 </Grid>
-                                <Grid item xs={6}>
+                                <Grid
+                                    item
+                                    xs={6}>
                                     <InputLabel
                                         className="text-sky-500"
                                         htmlFor="father">
@@ -290,7 +349,9 @@ export const AddStudent = memo(() => {
                                         {...register('father')}
                                     />
                                 </Grid>
-                                <Grid item xs={6}>
+                                <Grid
+                                    item
+                                    xs={6}>
                                     <InputLabel
                                         className="text-sky-500"
                                         htmlFor="mother">
@@ -304,8 +365,10 @@ export const AddStudent = memo(() => {
                                         {...register('mother')}
                                     />
                                 </Grid>
-                                {groupCookie == "admin" as string && (
-                                    <Grid item xs={6}>
+                                {groupCookie == ('admin' as string) && (
+                                    <Grid
+                                        item
+                                        xs={6}>
                                         <InputLabel
                                             className="text-sky-500"
                                             htmlFor="login">
@@ -319,25 +382,34 @@ export const AddStudent = memo(() => {
                                             id="group-select"
                                             value={group}
                                             label="Группа"
-                                            {...register('group' , {required: true})}
+                                            {...register('group', {
+                                                required: true,
+                                            })}
                                             onChange={handleChangeGroup}>
                                             <MenuItem value="">
                                                 <em>Не выбрано</em>
                                             </MenuItem>
-                                            {groupsDatas && groupsDatas.length &&
-                                                groupsDatas.map((item: IGroup) => {
-                                                    return (
-                                                        <MenuItem
-                                                            key={item.id}
-                                                            value={item.id}>
-                                                            <em>{item.name}</em>
-                                                        </MenuItem>
-                                                    );
-                                                })}
+                                            {groupsDatas &&
+                                                groupsDatas.length &&
+                                                groupsDatas.map(
+                                                    (item: IGroup) => {
+                                                        return (
+                                                            <MenuItem
+                                                                key={item.id}
+                                                                value={item.id}>
+                                                                <em>
+                                                                    {item.name}
+                                                                </em>
+                                                            </MenuItem>
+                                                        );
+                                                    },
+                                                )}
                                         </Select>
                                     </Grid>
                                 )}
-                                <Grid item xs={6}>
+                                <Grid
+                                    item
+                                    xs={6}>
                                     <InputLabel
                                         className="text-sky-500"
                                         htmlFor="birth_date">
@@ -349,8 +421,35 @@ export const AddStudent = memo(() => {
                                         className="date"
                                         {...register('birth_date')}
                                         type="date"
-                                        value = {date}
-                                        onChange= {handleDate} />
+                                        value={date}
+                                        onChange={handleDate}
+                                    />
+                                </Grid>
+                                <Grid
+                                    item
+                                    xs={6}>
+                                    <InputLabel
+                                        className="text-sky-500"
+                                        htmlFor="birth_date">
+                                        Изображение
+                                    </InputLabel>
+                                    <div
+                                        style={
+                                            isDragActive
+                                                ? {
+                                                      ...dropzoneStyle,
+                                                      ...activeDropzoneStyle,
+                                                  }
+                                                : dropzoneStyle
+                                        }
+                                        {...getRootProps()}>
+                                        <input {...getInputProps()} />
+                                        <p style={DropzoneText}>
+                                            Drag and drop your files here, or
+                                            click to select files
+                                        </p>
+                                        <ul>{fileList}</ul>
+                                    </div>
                                 </Grid>
                             </Grid>
                             <Button
@@ -359,7 +458,8 @@ export const AddStudent = memo(() => {
                                 Создать
                             </Button>
                         </form>
-                    </Box> )}
+                    </Box>
+                )}
             </Modal>
         </>
     );

@@ -1,11 +1,13 @@
 import { TextField } from '@mui/material';
 import { Column, Table } from '@tanstack/react-table';
+import { IStudent } from '../types/student';
+import { IUser } from '../types/user';
 
 export default function Filter({
     column,
 }: {
-    column: Column<any, any>;
-    table: Table<any>;
+    column: Column<IStudent, unknown> | Column<IUser, unknown>;
+    table: Table<IStudent> | Table<IUser>;
 }) {
     return (
         <div>

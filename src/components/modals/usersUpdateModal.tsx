@@ -5,14 +5,15 @@ import {
     Button,
     CircularProgress,
     InputLabel,
-    Modal, TextField,
+    Modal,
+    TextField,
     Typography,
 } from '@mui/material';
 import { useMutation } from '@tanstack/react-query';
 import { Dispatch, SetStateAction, memo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { IUserPassword } from '../../types/user';
-import {  updateUserByID } from '../../utils/https';
+import { updateUserByID } from '../../utils/https';
 import { SimpleSnackbar } from '../snackbar';
 
 interface IProps {
@@ -32,7 +33,6 @@ const style = {
 };
 
 export const UserUpdateModal = memo((props: IProps) => {
-
     const [same, setSame] = useState(true);
 
     const [snack, setSnack] = useState(false);
@@ -41,7 +41,7 @@ export const UserUpdateModal = memo((props: IProps) => {
 
     const [snackMessage, setSnackMessage] = useState('');
 
-    const { register, handleSubmit } = useForm<IUserPassword>();
+    const { register, handleSubmit, reset } = useForm<IUserPassword>();
 
     const { mutate, isError, isPending } = useMutation({
         mutationFn: updateUserByID,
@@ -53,7 +53,11 @@ export const UserUpdateModal = memo((props: IProps) => {
         },
     });
 
-    const handleClose = () => props.showHandler(false);
+    const handleClose = () => {
+        props.showHandler(false);
+        reset();
+        setSame(true);
+    };
 
     const onSubmit = (data: IUserPassword) => {
         console.log(data);

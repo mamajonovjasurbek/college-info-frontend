@@ -2,12 +2,14 @@ import {
     AlertColor,
     Box,
     Button,
-    CircularProgress, Grid,
+    CircularProgress,
+    Grid,
     InputLabel,
     MenuItem,
     Modal,
     Select,
-    SelectChangeEvent, TextField,
+    SelectChangeEvent,
+    TextField,
     Typography,
 } from '@mui/material';
 import { useMutation, useQuery } from '@tanstack/react-query';
@@ -38,7 +40,7 @@ export const AddUserComponent = memo(() => {
 
     const [isGroupDisabled, setIsGroupDisabled] = useState(true);
 
-    const [isGroupEnabled , setIsGroupEnabled] = useState(false)
+    const [isGroupEnabled, setIsGroupEnabled] = useState(false);
 
     const {
         data: groupsDatas,
@@ -48,15 +50,17 @@ export const AddUserComponent = memo(() => {
     } = useQuery({
         queryKey: ['groups'],
         queryFn: fetchGroups,
-        enabled:isGroupEnabled
+        enabled: isGroupEnabled,
     });
 
-    const { mutate, isError , isPending } = useMutation({
+    const { mutate, isError, isPending } = useMutation({
         mutationFn: createUser,
         onSuccess: () => {
-            queryClient.invalidateQueries({
-                queryKey: ['users'],
-            }).then(r => console.log(r));
+            queryClient
+                .invalidateQueries({
+                    queryKey: ['users'],
+                })
+                .then((r) => console.log(r));
             handleClose();
             setSnackMessage('Пользователь добавлен успешно');
             setSnackType('success');
@@ -66,9 +70,9 @@ export const AddUserComponent = memo(() => {
 
     const handleClose = () => {
         reset();
-        setGroup("")
-        setRole("")
-        setIsGroupEnabled(false)
+        setGroup('');
+        setRole('');
+        setIsGroupEnabled(false);
         setShow(false);
     };
 
@@ -89,9 +93,7 @@ export const AddUserComponent = memo(() => {
 
     const onSubmit = (data: ICreateUser) => {
         mutate(data);
-
     };
-
 
     if (isGroupsError) {
         return <ErrorPage err={groupsError} />;
@@ -118,12 +120,15 @@ export const AddUserComponent = memo(() => {
                 }}
                 onClick={() => {
                     setShow(true);
-                    setIsGroupEnabled(true)
+                    setIsGroupEnabled(true);
                 }}
                 variant="contained">
                 Добавить пользователя
             </Button>
             <Modal
+                sx={{
+                    overflow: 'scroll',
+                }}
                 open={show}
                 onClose={handleClose}
                 aria-labelledby="modal-modal-title"
@@ -142,8 +147,12 @@ export const AddUserComponent = memo(() => {
                                 className="text-dark-bg">
                                 Создать пользователя
                             </Typography>
-                            <Grid container spacing={2}>
-                                <Grid item xs={6}>
+                            <Grid
+                                container
+                                spacing={2}>
+                                <Grid
+                                    item
+                                    xs={6}>
                                     <InputLabel htmlFor="login">Имя</InputLabel>
                                     <TextField
                                         variant="outlined"
@@ -151,10 +160,14 @@ export const AddUserComponent = memo(() => {
                                         required
                                         placeholder="Введите имя"
                                         id="name"
-                                        {...register('name', { required: true })}
+                                        {...register('name', {
+                                            required: true,
+                                        })}
                                     />
                                 </Grid>
-                                <Grid item xs={6}>
+                                <Grid
+                                    item
+                                    xs={6}>
                                     <InputLabel
                                         className="text-sky-500"
                                         htmlFor="login">
@@ -166,10 +179,14 @@ export const AddUserComponent = memo(() => {
                                         fullWidth
                                         placeholder="Введите логин"
                                         id="login"
-                                        {...register('login', { required: true })}
+                                        {...register('login', {
+                                            required: true,
+                                        })}
                                     />
                                 </Grid>
-                                <Grid item xs={6}>
+                                <Grid
+                                    item
+                                    xs={6}>
                                     <InputLabel
                                         className="text-sky-500"
                                         htmlFor="login">
@@ -181,10 +198,14 @@ export const AddUserComponent = memo(() => {
                                         fullWidth
                                         placeholder="Введите пароль"
                                         id="password"
-                                        {...register('password', { required: true })}
+                                        {...register('password', {
+                                            required: true,
+                                        })}
                                     />
                                 </Grid>
-                                <Grid item xs={6}>
+                                <Grid
+                                    item
+                                    xs={6}>
                                     <InputLabel
                                         className="text-sky-500"
                                         htmlFor="login">
@@ -197,7 +218,9 @@ export const AddUserComponent = memo(() => {
                                         id="role-select"
                                         value={role}
                                         label="Роль"
-                                        {...register('role_id', { required: true })}
+                                        {...register('role_id', {
+                                            required: true,
+                                        })}
                                         onChange={handleChangeRole}>
                                         <MenuItem value="">
                                             <em>Не выбрано</em>
@@ -206,7 +229,9 @@ export const AddUserComponent = memo(() => {
                                         <MenuItem value={3}>Учитель</MenuItem>
                                     </Select>
                                 </Grid>
-                                <Grid item xs={6}>
+                                <Grid
+                                    item
+                                    xs={6}>
                                     <InputLabel
                                         className="text-sky-500"
                                         htmlFor="login">
@@ -225,7 +250,8 @@ export const AddUserComponent = memo(() => {
                                         <MenuItem value="">
                                             <em>Не выбрано</em>
                                         </MenuItem>
-                                        {groupsDatas && groupsDatas.length &&
+                                        {groupsDatas &&
+                                            groupsDatas.length &&
                                             groupsDatas.map((item: IGroup) => {
                                                 return (
                                                     <MenuItem
@@ -238,7 +264,6 @@ export const AddUserComponent = memo(() => {
                                     </Select>
                                 </Grid>
                             </Grid>
-
 
                             <Button
                                 type="submit"

@@ -56,7 +56,8 @@ export default function TableComponentStudents(props: Props) {
 
     const [deleteModal, setDeleteModal] = useState<boolean>(false);
 
-    const [deleteSelectedModal , setDeleteSelectedModal] = useState<boolean>(false)
+    const [deleteSelectedModal, setDeleteSelectedModal] =
+        useState<boolean>(false);
 
     const { mutate, isPending, isError } = useMutation({
         mutationFn: postStudentsData,
@@ -111,7 +112,8 @@ export default function TableComponentStudents(props: Props) {
             {
                 header: 'Дата рождения',
                 accessorKey: 'birth_date',
-                cell: (info) => cutDate(info.getValue<IBirthDate>().String as string),
+                cell: (info) =>
+                    cutDate(info.getValue<IBirthDate>().String as string),
             },
             {
                 header: 'Место рождения',
@@ -208,6 +210,7 @@ export default function TableComponentStudents(props: Props) {
         console.log(students);
 
         mutate(students);
+        table.toggleAllPageRowsSelected(false);
     };
 
     const reloadTable = () => {
@@ -244,7 +247,7 @@ export default function TableComponentStudents(props: Props) {
             <StudentSelectedDeleteModal
                 show={deleteSelectedModal}
                 showHandler={setDeleteSelectedModal}
-                table  = {table}
+                table={table}
                 rows={table.getSelectedRowModel().flatRows}
             />
             {isPending ? (

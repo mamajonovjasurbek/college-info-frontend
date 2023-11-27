@@ -1,5 +1,5 @@
 import Cookies from 'universal-cookie';
-import { IStudent } from '../types/student';
+import { IStudent, ITest } from '../types/student';
 import { ICreateUser, IUser, IUserPassword } from '../types/user';
 import { saveAs } from 'file-saver';
 import axios from 'axios';
@@ -21,9 +21,9 @@ instance.interceptors.response.use(
 
             cookies.remove('name', { sameSite: 'none', secure: true });
 
-            cookies.remove("group" , {sameSite : "none" , secure : true});
+            cookies.remove('group', { sameSite: 'none', secure: true });
 
-            cookies.remove("groupID" , {sameSite : "none" , secure : true});
+            cookies.remove('groupID', { sameSite: 'none', secure: true });
 
             alert('Ошибка при аутентификации , залогинитесь снова пожалуйста');
             window.location.replace('/');
@@ -32,12 +32,12 @@ instance.interceptors.response.use(
     },
 );
 
-interface  IUpdateUserProps {
-    id : string ,
-    data : IUserPassword
+interface IUpdateUserProps {
+    id: string;
+    data: IUserPassword;
 }
 
-export async function updateUserByID({ id, data } : IUpdateUserProps) {
+export async function updateUserByID({ id, data }: IUpdateUserProps) {
     const cookies = new Cookies();
     const token = cookies.get('Authorization');
 
@@ -153,7 +153,7 @@ export async function postStudentsData(data: IStudent[]) {
     }).then((result) => {
         console.log(result);
         // @ts-ignore
-        saveAs(result.data , 'result.xlsx');
+        saveAs(result.data, 'result.xlsx');
     });
 }
 
@@ -172,12 +172,12 @@ export async function deleteStudentByID(id: string) {
     return response.data;
 }
 
-interface IUpdateProps{
-    id : string,
-    data : IStudent
+interface IUpdateProps {
+    id: string;
+    data: IStudent;
 }
 
-export async function updateStudentByID({ id, data } : IUpdateProps) {
+export async function updateStudentByID({ id, data }: IUpdateProps) {
     const cookies = new Cookies();
     const token = cookies.get('Authorization');
 
@@ -216,9 +216,7 @@ export async function getStudentByID(id: string) {
     return response.data;
 }
 
-
-
-export async function createStudent(data: IStudent) {
+export async function createStudent(data: FormData) {
     const cookies = new Cookies();
     const token = cookies.get('Authorization');
 
@@ -227,7 +225,7 @@ export async function createStudent(data: IStudent) {
     const response = await instance({
         method: 'post',
         url: '/students',
-        data : data,
+        data: data,
         headers: {
             Authorization: `Bearer ${token}`,
         },
@@ -236,7 +234,6 @@ export async function createStudent(data: IStudent) {
     return response.data;
 }
 
-
 export async function deleteSelectedStudent(id: string[]) {
     const cookies = new Cookies();
     const token = cookies.get('Authorization');
@@ -244,9 +241,22 @@ export async function deleteSelectedStudent(id: string[]) {
     const response = await instance({
         method: 'delete',
         url: '/students',
-        data : id,
+        data: id,
         headers: {
             Authorization: `Bearer ${token}`,
+        },
+    });
+
+    return response.data;
+}
+
+export async function testForm(data: FormData) {
+    const response = await instance({
+        method: 'post',
+        url: '/form',
+        data: data,
+        headers: {
+            'Content-Type': 'multipart/form-data',
         },
     });
 
