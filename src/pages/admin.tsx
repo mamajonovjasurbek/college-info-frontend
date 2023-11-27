@@ -40,7 +40,7 @@ export default function Admin() {
     }
 
     return (
-        <div className="pt-5 flex flex-col gap-5">
+        <div className="pt-3 flex flex-col gap-3">
             <AddUserComponent />
             <TableComponentUsers users={usersDatas} />
         </div>

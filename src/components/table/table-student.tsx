@@ -32,6 +32,8 @@ import { Loader } from '../loader.tsx';
 import { TableRowButton } from './row-button.tsx';
 import { StudentUpdateModal } from '../modals/studentUpdateModal.tsx';
 import { StudentDeleteModal } from '../modals/studentDeleteModal.tsx';
+import { StudentSelectedDeleteModal } from '../modals/studentSelectedDeleteModal.tsx';
+import { cutDate } from '../../utils/helper-functions.ts';
 
 type Props = {
     data: IStudent[];
@@ -54,7 +56,9 @@ export default function TableComponentStudents(props: Props) {
 
     const [deleteModal, setDeleteModal] = useState<boolean>(false);
 
-    const { mutate, isPending, isError, error } = useMutation({
+    const [deleteSelectedModal , setDeleteSelectedModal] = useState<boolean>(false)
+
+    const { mutate, isPending, isError } = useMutation({
         mutationFn: postStudentsData,
         onSuccess: () => {
             setSnackMessage('Excel файл успешно создан');
@@ -107,7 +111,7 @@ export default function TableComponentStudents(props: Props) {
             {
                 header: 'Дата рождения',
                 accessorKey: 'birth_date',
-                cell: (info) => info.getValue<IBirthDate>().String,
+                cell: (info) => cutDate(info.getValue<IBirthDate>().String as string),
             },
             {
                 header: 'Место рождения',
@@ -218,11 +222,6 @@ export default function TableComponentStudents(props: Props) {
         setSnack(true);
     }
 
-    // interface IProps {
-    //     show: boolean;
-    //     id: string;
-    //     showHandler: Dispatch<SetStateAction<boolean>>;
-    // }
     return (
         <div>
             <SimpleSnackbar
@@ -241,6 +240,12 @@ export default function TableComponentStudents(props: Props) {
                 show={deleteModal}
                 id={studentID}
                 showHandler={setDeleteModal}
+            />
+            <StudentSelectedDeleteModal
+                show={deleteSelectedModal}
+                showHandler={setDeleteSelectedModal}
+                table  = {table}
+                rows={table.getSelectedRowModel().flatRows}
             />
             {isPending ? (
                 <Loader />

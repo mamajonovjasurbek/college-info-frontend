@@ -1,22 +1,17 @@
-/* eslint-disable react-refresh/only-export-components */
-import {
-    AlertColor,
-    Box,
-    Button,
-    CircularProgress,
-    Modal,
-    Typography,
-} from '@mui/material';
+import { Dispatch, memo, SetStateAction, useState } from 'react';
+import { AlertColor, Box, Button, CircularProgress, Modal, Typography } from '@mui/material';
 import { useMutation } from '@tanstack/react-query';
-import { Dispatch, SetStateAction, memo, useState } from 'react';
-import { deleteStudentByID } from '../../utils/https';
+import { deleteSelectedStudent } from '../../utils/https.ts';
 import { queryClient } from '../../main.tsx';
 import { SimpleSnackbar } from '../snackbar.tsx';
+import { Row, Table } from '@tanstack/react-table';
+import { IStudent } from '../../types/student.ts';
 
 interface IProps {
     show: boolean;
-    id: string;
+    rows: Row<IStudent>[];
     showHandler: Dispatch<SetStateAction<boolean>>;
+    table : Table<IStudent>
 }
 
 const style = {
@@ -31,7 +26,8 @@ const style = {
     p: 4,
 };
 
-export const StudentDeleteModal = memo((props: IProps) => {
+
+export const StudentSelectedDeleteModal  = memo(({ rows, show, showHandler , table }: IProps) =>{
     const [snack, setSnack] = useState(false);
 
     const [snackType, setSnackType] = useState<AlertColor>('success');
@@ -39,7 +35,7 @@ export const StudentDeleteModal = memo((props: IProps) => {
     const [snackMessage, setSnackMessage] = useState('');
 
     const { mutate, isError, isPending } = useMutation({
-        mutationFn: deleteStudentByID,
+        mutationFn: deleteSelectedStudent,
         onSuccess: () => {
             queryClient.invalidateQueries({
                 queryKey: ['students'],
@@ -51,10 +47,16 @@ export const StudentDeleteModal = memo((props: IProps) => {
         },
     });
 
-    const handleClose = () => props.showHandler(false);
+    const handleClose = () => showHandler(false);
 
     const deleteHandler = () => {
-        mutate(props.id);
+        const ids : string[]  = []
+
+        for (let i = 0; i < rows?.length; i++) {
+            ids.push(rows[i]?.original?.id as string)
+        }
+        mutate(ids);
+        table.toggleAllPageRowsSelected(false)
     };
 
     if (isError) {
@@ -72,8 +74,16 @@ export const StudentDeleteModal = memo((props: IProps) => {
                 message={snackMessage}
                 type={snackType}
             />
+            <Button
+                disabled = {rows?.length === 0}
+                variant="contained"
+                onClick = {() => showHandler(true)}
+                color="error"
+            >
+                Удалить выбранных студентов
+            </Button>
             <Modal
-                open={props.show}
+                open={show}
                 onClose={handleClose}
                 aria-labelledby="modal-modal-title"
                 aria-describedby="modal-modal-description">
@@ -86,7 +96,7 @@ export const StudentDeleteModal = memo((props: IProps) => {
                         <Typography
                             variant="h5"
                             className="text-dark-bg text-center">
-                            Удалить студента
+                            Удалить  {rows.length > 1  ? "студентов" : "студента"}
                         </Typography>
 
                         <div className="flex gap-2 justify-center mt-4">
@@ -107,4 +117,4 @@ export const StudentDeleteModal = memo((props: IProps) => {
             </Modal>
         </>
     );
-});
+})

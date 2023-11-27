@@ -38,6 +38,10 @@ export const Auth = () => {
 
     const [, setNameCookie] = useCookies(['name']);
 
+    const [, setGroupCookie] = useCookies(['group']);
+
+    const [, setGroupIDCookie] =  useCookies(['groupID']);
+
     const { register, handleSubmit } = useForm<Inputs>();
 
     const { data, mutate, isError, isPending } = useMutation({
@@ -66,6 +70,24 @@ export const Auth = () => {
             });
 
             setNameCookie('name', data?.data?.name, {
+                path: '/',
+                sameSite: 'none',
+                secure: true,
+            });
+
+            setGroupCookie('group', data?.data?.group, {
+                path: '/',
+                sameSite: 'none',
+                secure: true,
+            });
+
+            setGroupCookie('group', data?.data?.group, {
+                path: '/',
+                sameSite: 'none',
+                secure: true,
+            });
+
+            setGroupIDCookie('groupID', data?.data?.groupID, {
                 path: '/',
                 sameSite: 'none',
                 secure: true,

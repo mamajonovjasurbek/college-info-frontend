@@ -4,18 +4,16 @@ import {
     Box,
     Button,
     CircularProgress,
-    Input,
     InputLabel,
-    Modal,
+    Modal, TextField,
     Typography,
 } from '@mui/material';
 import { useMutation } from '@tanstack/react-query';
 import { Dispatch, SetStateAction, memo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { IUserPassword } from '../../types/user';
-import { updataUserByID } from '../../utils/https';
+import {  updateUserByID } from '../../utils/https';
 import { SimpleSnackbar } from '../snackbar';
-import { useNavigate } from 'react-router-dom';
 
 interface IProps {
     show: boolean;
@@ -34,7 +32,6 @@ const style = {
 };
 
 export const UserUpdateModal = memo((props: IProps) => {
-    const navigate = useNavigate();
 
     const [same, setSame] = useState(true);
 
@@ -46,8 +43,8 @@ export const UserUpdateModal = memo((props: IProps) => {
 
     const { register, handleSubmit } = useForm<IUserPassword>();
 
-    const { mutate, isError, isPending, error } = useMutation({
-        mutationFn: updataUserByID,
+    const { mutate, isError, isPending } = useMutation({
+        mutationFn: updateUserByID,
         onSuccess: () => {
             handleClose();
             setSnackMessage('Пароль пользователя изменен успешно');
@@ -69,9 +66,6 @@ export const UserUpdateModal = memo((props: IProps) => {
     };
 
     if (isError) {
-        if (error?.response?.status === 401) {
-            navigate('/');
-        }
         handleClose();
         setSnackMessage('Ошибка при изменении пароля пользователя');
         setSnackType('error');
@@ -99,7 +93,7 @@ export const UserUpdateModal = memo((props: IProps) => {
                     <Box sx={style}>
                         <form
                             onSubmit={handleSubmit(onSubmit)}
-                            className="border-2 p-10 rounded-lg flex flex-col gap-6">
+                            className="border-2 p-10 rounded-lg flex flex-col gap-3">
                             <Typography
                                 variant="h5"
                                 className="text-dark-bg text-center">
@@ -110,7 +104,10 @@ export const UserUpdateModal = memo((props: IProps) => {
                                 htmlFor="login">
                                 Новый пароль
                             </InputLabel>
-                            <Input
+                            <TextField
+                                required
+                                fullWidth
+                                variant="outlined"
                                 placeholder="Введите пароль"
                                 id="password"
                                 {...register('newPassword', { required: true })}
@@ -120,7 +117,10 @@ export const UserUpdateModal = memo((props: IProps) => {
                                 htmlFor="login">
                                 Подвердить пароль
                             </InputLabel>
-                            <Input
+                            <TextField
+                                required
+                                fullWidth
+                                variant="outlined"
                                 placeholder="Введите пароль"
                                 id="confirmPassword"
                                 {...register('confirmPassword', {

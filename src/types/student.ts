@@ -1,5 +1,5 @@
 export interface IStudent {
-    id: string;
+    id?: string;
     name: string;
     birth_date: IBirthDate;
     location: string;

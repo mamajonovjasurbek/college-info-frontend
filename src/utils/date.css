@@ -1,0 +1,17 @@
+
+.date{
+    background-color: #fff;
+    padding: 11px;
+    font-family: "Roboto Mono",monospace;
+    color: #ffffff;
+    font-size: 18px;
+    border: 1px solid #58585C;
+    outline: none;
+    border-radius: 5px;
+}
+::-webkit-calendar-picker-indicator{
+    background-color: #ffffff;
+    padding: 5px;
+    cursor: pointer;
+    border-radius: 3px;
+}

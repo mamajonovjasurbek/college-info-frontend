@@ -1,7 +1,6 @@
 /* eslint-disable react-refresh/only-export-components */
 import { Box, Button, Modal, Typography } from '@mui/material';
-import { Dispatch, SetStateAction } from 'react';
-import { useNavigate } from 'react-router-dom';
+import {Dispatch, SetStateAction} from 'react';
 import Cookies from 'universal-cookie';
 
 interface IProps {
@@ -22,19 +21,23 @@ const style = {
 };
 
 export default function ExitModal(props: IProps) {
-    const navigate = useNavigate();
-
     const cookies = new Cookies();
 
     const handleClose = () => props.showHandler(false);
 
     const exitHandler = () => {
         try {
-            cookies.remove("Authorization");
-            cookies.remove("role");
-            cookies.remove("name");
+            cookies.remove("Authorization" , {sameSite : "none" , secure : true});
 
-            navigate('/');
+            cookies.remove("role" , {sameSite : "none" , secure : true});
+
+            cookies.remove("name" , {sameSite : "none" , secure : true});
+
+            cookies.remove("group" , {sameSite : "none" , secure : true});
+
+            cookies.remove("groupID" , {sameSite : "none" , secure : true});
+
+            window.location.replace('/');
         } catch (err) {
             console.log(err);
         }
