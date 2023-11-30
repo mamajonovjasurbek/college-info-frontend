@@ -16,13 +16,13 @@ import { Dispatch, SetStateAction, memo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import {
     fetchGroups,
-    getStudentByID,
-    updateStudentByID,
+    getStudentByID, getStudentImageByID, updateStudentByID,
 } from '../../utils/https';
 import { SimpleSnackbar } from '../snackbar';
 import { IStudent } from '../../types/student';
 import { IGroup } from '../../types/group';
 import { queryClient } from '../../main';
+import {DragDrop} from "../dragDrop.tsx";
 
 interface IProps {
     show: boolean;
@@ -38,9 +38,12 @@ const style = {
     transform: 'translate(-50%, -50%)',
     bgcolor: 'background.paper',
     boxShadow: 24,
+    maxHeight: "calc(100vh - 210px)",
+    overflowY: "auto",
 };
 
 export const StudentUpdateModal = memo((props: IProps) => {
+
     const {
         data: studentData,
         isLoading: isGetStudentLoading,
@@ -61,6 +64,18 @@ export const StudentUpdateModal = memo((props: IProps) => {
         enabled: props.makeQuery,
     });
 
+
+    const {
+        data: imageData,
+        isLoading: isImageLoading,
+        isError: isImageError,
+    } = useQuery({
+        queryKey: ['image' , props.id] ,
+        queryFn: () => getStudentImageByID(props.id),
+        enabled: props.makeQuery,
+    });
+
+
     const { mutate, isError, isPending } = useMutation({
         mutationFn: updateStudentByID,
         onSuccess: () => {
@@ -74,6 +89,7 @@ export const StudentUpdateModal = memo((props: IProps) => {
             setSnack(true);
         },
     });
+    const [files, setFiles] = useState<(File & {preview:string})[]>([]);
 
     const [snack, setSnack] = useState(false);
 
@@ -91,18 +107,25 @@ export const StudentUpdateModal = memo((props: IProps) => {
 
     const handleClose = () => {
         props.showHandler(false);
+        setFiles([])
         reset();
     };
 
     const onSubmit = (data: IStudent) => {
-        console.log(data, props.id);
+        const formData = new FormData();
+
+        formData.append('location', data.location);
+        formData.append('study_dir', data.study_dir);
+        formData.append('course', data.course);
+        formData.append('group', group);
+        formData.append("image" , files[0])
 
         if (data && props.id) {
-            mutate({ id: props.id, data: data });
+            mutate({ id: props.id, data: formData });
         }
     };
 
-    if (isError || isGetStudentError || isGroupsError) {
+    if (isError || isGetStudentError || isGroupsError || isImageError) {
         handleClose();
         setSnackMessage('Ошибка при изменении данных студента');
         setSnackType('error');
@@ -125,7 +148,7 @@ export const StudentUpdateModal = memo((props: IProps) => {
                 <>
                     {isPending ||
                         isGetStudentLoading ||
-                        (isGroupsLoading && (
+                        (isGroupsLoading || isImageLoading && (
                             <Box sx={{ display: 'flex' }}>
                                 <CircularProgress />
                             </Box>
@@ -242,8 +265,30 @@ export const StudentUpdateModal = memo((props: IProps) => {
                                             })}
                                         </Select>
                                     </Grid>
-                                </Grid>
 
+                                    <Grid
+                                        item
+                                        xs={12}>
+                                        <InputLabel
+                                            className="text-sky-500"
+                                            htmlFor="birth_date">
+                                            Новое изображение
+                                        </InputLabel>
+                                             <DragDrop files={files} setFiles={setFiles}/>
+                                        </Grid>
+                                </Grid>
+                                <Grid
+                                    item
+                                >
+                                    <InputLabel
+                                        className="text-sky-500"
+                                        htmlFor="birth_date">
+                                        Текущее изображение
+                                    </InputLabel>
+                                    <div className="w-full flex justify-center">
+                                        <img src={imageData && imageData.size > 0   ? URL.createObjectURL(imageData) : "/unknown-double.jpg"} alt="student-image"/>
+                                    </div>
+                                </Grid>
                                 <Button
                                     disabled={group == ''}
                                     type="submit"

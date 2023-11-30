@@ -1,5 +1,5 @@
 import Cookies from 'universal-cookie';
-import { IStudent, ITest } from '../types/student';
+import { IStudent } from '../types/student';
 import { ICreateUser, IUser, IUserPassword } from '../types/user';
 import { saveAs } from 'file-saver';
 import axios from 'axios';
@@ -177,7 +177,7 @@ interface IUpdateProps {
     data: IStudent;
 }
 
-export async function updateStudentByID({ id, data }: IUpdateProps) {
+export async function updateStudentByIDOld({ id, data }: IUpdateProps) {
     const cookies = new Cookies();
     const token = cookies.get('Authorization');
 
@@ -201,6 +201,29 @@ export async function updateStudentByID({ id, data }: IUpdateProps) {
     return response.data;
 }
 
+interface  IUpdateWithImageProps{
+    id : string,
+    data : FormData
+}
+
+
+export async function updateStudentByID({ id, data }: IUpdateWithImageProps) {
+    const cookies = new Cookies();
+    const token = cookies.get('Authorization');
+
+    console.log(data);
+    const response = await instance({
+        method: 'put',
+        url: '/students/' + id,
+        data: data,
+        headers: {
+            Authorization: `Bearer ${token}`,
+        },
+    });
+
+    return response.data;
+}
+
 export async function getStudentByID(id: string) {
     const cookies = new Cookies();
     const token = cookies.get('Authorization');
@@ -208,6 +231,40 @@ export async function getStudentByID(id: string) {
     const response = await instance({
         method: 'get',
         url: '/students/' + id,
+        headers: {
+            Authorization: `Bearer ${token}`,
+        },
+    });
+
+    return response.data;
+}
+
+export async function getStudentImageByID(id: string) {
+    const cookies = new Cookies();
+    const token = cookies.get('Authorization');
+
+    const response = await instance({
+        method: 'get',
+        url: '/students/image/' + id,
+        headers: {
+            Authorization: `Bearer ${token}`,
+        },
+        responseType: 'blob',
+    });
+
+    console.log(response.data)
+
+    return response.data;
+}
+
+export async function createStudentOld(data: IStudent) {
+    const cookies = new Cookies();
+    const token = cookies.get('Authorization');
+
+    const response = await instance({
+        method: 'post',
+        url: '/students',
+        data: data,
         headers: {
             Authorization: `Bearer ${token}`,
         },
@@ -228,11 +285,12 @@ export async function createStudent(data: FormData) {
         data: data,
         headers: {
             Authorization: `Bearer ${token}`,
+            'Content-Type': 'multipart/form-data',
         },
     });
-
     return response.data;
 }
+
 
 export async function deleteSelectedStudent(id: string[]) {
     const cookies = new Cookies();
@@ -244,19 +302,6 @@ export async function deleteSelectedStudent(id: string[]) {
         data: id,
         headers: {
             Authorization: `Bearer ${token}`,
-        },
-    });
-
-    return response.data;
-}
-
-export async function testForm(data: FormData) {
-    const response = await instance({
-        method: 'post',
-        url: '/form',
-        data: data,
-        headers: {
-            'Content-Type': 'multipart/form-data',
         },
     });
 

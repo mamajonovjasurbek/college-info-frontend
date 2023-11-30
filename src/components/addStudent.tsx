@@ -14,25 +14,18 @@ import {
     Typography,
 } from '@mui/material';
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { ChangeEvent, memo, useState, useMemo, useCallback } from 'react';
+import {ChangeEvent, memo, useState, useMemo} from 'react';
 import { useForm } from 'react-hook-form';
 import ErrorPage from '../pages/error';
 import { SimpleSnackbar } from './snackbar';
-import { createStudent, fetchGroups } from '../utils/https';
+import {createStudent, fetchGroups} from '../utils/https';
 import { IStudent } from '../types/student.ts';
 import { IGroup } from '../types/group.ts';
 import { modalStyle } from '../styles/mui-styles.ts';
 import '../utils/date.css';
 import { queryClient } from '../main.tsx';
 import Cookies from 'universal-cookie';
-import { useDropzone } from 'react-dropzone';
-import {
-    DropzoneText,
-    FileName,
-    ImagePreview,
-    dropzoneStyle,
-    activeDropzoneStyle,
-} from '../styles/drag-and-drop.ts';
+import {DragDrop} from "./dragDrop.tsx";
 
 export const AddStudent = memo(() => {
     const cookies = new Cookies();
@@ -43,7 +36,7 @@ export const AddStudent = memo(() => {
 
     const { register, handleSubmit, reset } = useForm<IStudent>();
 
-    const [files, setFiles] = useState([]);
+    const [files, setFiles] = useState<(File & {preview:string})[]>([]);
 
     const [snack, setSnack] = useState(false);
 
@@ -104,39 +97,11 @@ export const AddStudent = memo(() => {
         },
     });
 
-    const onDrop = useCallback((acceptedFiles) => {
-        setFiles(
-            acceptedFiles.map((file) =>
-                Object.assign(file, {
-                    preview: URL.createObjectURL(file),
-                }),
-            ),
-        );
-    }, []);
-
-    const { getRootProps, getInputProps, isDragActive } = useDropzone({
-        onDrop,
-        accept: {
-            'image/*': ['.jpeg', '.jpg', '.png'],
-        },
-        maxSize: 1024 * 1024 * 5,
-        maxFiles: 1,
-    });
-
-    const fileList = files.map((file) => (
-        <li key={file.name}>
-            <img
-                style={ImagePreview}
-                src={file.preview}
-                alt={file.name}
-            />
-            <span style={FileName}>{file.name}</span>
-        </li>
-    ));
 
     const handleClose = () => {
         reset(defaultValues);
         setGroup('');
+        setFiles([])
         setShow(false);
     };
 
@@ -155,16 +120,16 @@ export const AddStudent = memo(() => {
                 : data.group;
 
         formData.append('name', data.name);
-        formData.append('birth_date', data.birth_date.String as string);
+        formData.append('birth_date', date as string);
         formData.append('location', data.location);
         formData.append('pass_number', data.pass_number);
-        formData.append('pinfl', data.pinfl);
+        formData.append('location', data.pinfl);
         formData.append('study_dir', data.study_dir);
         formData.append('course', data.course);
         formData.append('father', data.father);
         formData.append('mother', data.mother);
         formData.append('group', group);
-
+        formData.append("image" , files[0])
         mutate(formData);
     };
 
@@ -205,7 +170,7 @@ export const AddStudent = memo(() => {
                 aria-labelledby="modal-modal-title"
                 aria-describedby="modal-modal-description">
                 {isGroupsLoading || isPending ? (
-                    <Box sx={{ display: 'flex' }}>
+                    <Box sx={{ display: 'flex' , overflow: "auto"}}>
                         <CircularProgress />
                     </Box>
                 ) : (
@@ -427,30 +392,14 @@ export const AddStudent = memo(() => {
                                 </Grid>
                                 <Grid
                                     item
-                                    xs={6}>
+                                    xs={12}>
                                     <InputLabel
                                         className="text-sky-500"
                                         htmlFor="birth_date">
                                         Изображение
                                     </InputLabel>
-                                    <div
-                                        style={
-                                            isDragActive
-                                                ? {
-                                                      ...dropzoneStyle,
-                                                      ...activeDropzoneStyle,
-                                                  }
-                                                : dropzoneStyle
-                                        }
-                                        {...getRootProps()}>
-                                        <input {...getInputProps()} />
-                                        <p style={DropzoneText}>
-                                            Drag and drop your files here, or
-                                            click to select files
-                                        </p>
-                                        <ul>{fileList}</ul>
-                                    </div>
-                                </Grid>
+                           `      <DragDrop files={files} setFiles={setFiles}/>
+                               ` </Grid>
                             </Grid>
                             <Button
                                 type="submit"

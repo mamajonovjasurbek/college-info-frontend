@@ -3,8 +3,8 @@ import { useQuery } from '@tanstack/react-query';
 import { getStudents } from '../utils/https.ts';
 import { Typography } from '@mui/material';
 import ErrorPage from './error.tsx';
-import {AddStudent} from "../components/addStudent.tsx";
 import { Loader } from '../components/loader.tsx';
+import {AddStudent} from "../components/addStudent.tsx";
 export default function Home() {
     const {
         data: datas,

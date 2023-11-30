@@ -9,7 +9,7 @@ import Admin from './pages/admin.tsx';
 import {AdapterDayjs} from "@mui/x-date-pickers/AdapterDayjs";
 import {LocalizationProvider} from "@mui/x-date-pickers/LocalizationProvider";
 import { NotFound } from './pages/notFound.tsx';
-import Test from "./pages/test.tsx";
+import ProfilePage from './pages/profile.tsx';
 export const router = createBrowserRouter([
     {
         path: '/home',
@@ -24,6 +24,10 @@ export const router = createBrowserRouter([
                 path: 'admin',
                 element: <Admin />,
             },
+            {
+                path : ":id",
+                element : <ProfilePage/>
+            }
         ],
     },
 
@@ -35,10 +39,6 @@ export const router = createBrowserRouter([
         path  : "*",
         element: <NotFound/>
     },
-    {
-        path  : "/test",
-        element: <Test/>
-    }
 ]);
 
 export const queryClient = new QueryClient({
@@ -55,7 +55,7 @@ export const queryClient = new QueryClient({
 ReactDOM.createRoot(document.getElementById('root')!).render(
     <QueryClientProvider client={queryClient}>
         <LocalizationProvider dateAdapter={AdapterDayjs}>
-            <RouterProvider router={router} />
+                <RouterProvider router={router} />
         </LocalizationProvider>
     </QueryClientProvider>,
 );

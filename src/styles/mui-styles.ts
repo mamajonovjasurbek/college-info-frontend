@@ -22,7 +22,10 @@ export const modalStyle = {
     color : "#fff",
     top: '50%',
     left: '50%',
+    maxHeight: "calc(100vh - 210px)",
+    overflowY: "auto",
     transform: 'translate(-50%, -50%)',
+    overflow : "scroll"
 }
 
 

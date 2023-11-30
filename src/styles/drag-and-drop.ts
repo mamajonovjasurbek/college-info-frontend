@@ -1,4 +1,6 @@
-export const dropzoneStyle = {
+import {CSSProperties} from "react";
+
+export const dropzoneStyle : CSSProperties = {
     flex: 1,
     display: 'flex',
     flexDirection: 'column',
@@ -21,14 +23,14 @@ export const activeDropzoneStyle = {
     borderColor: '#00adb5',
 };
 
-export const DropzoneText = {
+export const DropzoneText : CSSProperties = {
     margin: '0',
     fontSize: '16px',
     fontWeight: '600',
     textAlign: 'center',
 };
 
-export const ImagePreview = {
+export const ImagePreview : CSSProperties = {
     display: 'flex',
     maxWidth: '100%',
     maxHeight: '100%',
@@ -36,7 +38,7 @@ export const ImagePreview = {
     borderRadius: '2px',
 };
 
-export const FileName = {
+export const FileName : CSSProperties = {
     display: 'flex',
     fontSize: '14px',
     marginTop: '8px',

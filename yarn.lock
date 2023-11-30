@@ -253,6 +253,11 @@
     "@emotion/weak-memoize" "^0.3.1"
     stylis "4.2.0"
 
+"@emotion/core@^11.0.0":
+  version "11.0.0"
+  resolved "https://registry.yarnpkg.com/@emotion/core/-/core-11.0.0.tgz#d075867e07864119de7cfd5268c15012bd2d6290"
+  integrity sha512-w4sE3AmHmyG6RDKf6mIbtHpgJUSJ2uGvPQb8VXFL7hFjMPibE8IiehG8cMX3Ztm4svfCQV6KqusQbeIOkurBcA==
+
 "@emotion/hash@^0.9.1":
   version "0.9.1"
   resolved "https://registry.yarnpkg.com/@emotion/hash/-/hash-0.9.1.tgz#4ffb0055f7ef676ebc3a5a91fb621393294e2f43"
@@ -531,6 +536,11 @@
   resolved "https://registry.yarnpkg.com/@floating-ui/utils/-/utils-0.1.6.tgz#22958c042e10b67463997bd6ea7115fe28cbcaf9"
   integrity sha512-OfX7E2oUDYxtBvsuS4e/jSn4Q9Qb6DzgeYtsAdkPZ47znpoNsMgZw0+tVijiv3uGNR6dgNlty6r9rzIzHjtd/A==
 
+"@fontsource/inter@^5.0.15":
+  version "5.0.15"
+  resolved "https://registry.yarnpkg.com/@fontsource/inter/-/inter-5.0.15.tgz#c01d160cd02bde1a4ce09f2c38b2063b66caf870"
+  integrity sha512-/IoWYEXl8lqJEx50JqNPT+bI4VNwxb/bg2oOfvG8PiEsDsmHRFvWBVHlohBNn1+QdBf+KbAjU/gb4vlGOSsVWw==
+
 "@humanwhocodes/config-array@^0.11.13":
   version "0.11.13"
   resolved "https://registry.yarnpkg.com/@humanwhocodes/config-array/-/config-array-0.11.13.tgz#075dc9684f40a531d9b26b0822153c1e832ee297"
@@ -606,6 +616,20 @@
   integrity sha512-o2z49R1G4SdBaxZjbMmkn+2OdT1bKymLvAYaB6pH59obM1CYv/0vAVm6zO31IqhwtYwXv6A7sLIwCGYTaVkcdg==
   dependencies:
     "@babel/runtime" "^7.23.2"
+
+"@mui/joy@^5.0.0-beta.15":
+  version "5.0.0-beta.15"
+  resolved "https://registry.yarnpkg.com/@mui/joy/-/joy-5.0.0-beta.15.tgz#38f846aebc403699a3264481b9d635403c096518"
+  integrity sha512-CJU6DPs6yGMIGiZpku4audyAKcAXBM9vgeeegXVt68dGhAXeSSVd+UKynUoj4gcwh0Zxbfxav6oohVYoGX6bpg==
+  dependencies:
+    "@babel/runtime" "^7.23.2"
+    "@mui/base" "5.0.0-beta.24"
+    "@mui/core-downloads-tracker" "^5.14.18"
+    "@mui/system" "^5.14.18"
+    "@mui/types" "^7.2.9"
+    "@mui/utils" "^5.14.18"
+    clsx "^2.0.0"
+    prop-types "^15.8.1"
 
 "@mui/material@^5.14.18":
   version "5.14.18"

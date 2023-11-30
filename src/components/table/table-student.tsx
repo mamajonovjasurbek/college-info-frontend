@@ -16,7 +16,7 @@ import {
     TableContainer,
     TableHead,
     TableRow,
-    AlertColor,
+    AlertColor, Button,
 } from '@mui/material';
 
 import Filter from '../filter.tsx';
@@ -30,10 +30,11 @@ import { IndeterminateCheckbox } from '../selectionCheck.tsx';
 import { TableHeader } from './table-header.tsx';
 import { Loader } from '../loader.tsx';
 import { TableRowButton } from './row-button.tsx';
-import { StudentUpdateModal } from '../modals/studentUpdateModal.tsx';
 import { StudentDeleteModal } from '../modals/studentDeleteModal.tsx';
 import { StudentSelectedDeleteModal } from '../modals/studentSelectedDeleteModal.tsx';
 import { cutDate } from '../../utils/helper-functions.ts';
+import {StudentUpdateModal} from "../modals/studentUpdateModal.tsx";
+import {useNavigate} from "react-router-dom";
 
 type Props = {
     data: IStudent[];
@@ -41,7 +42,7 @@ type Props = {
 
 export default function TableComponentStudents(props: Props) {
     const [rowSelection, setRowSelection] = useState({});
-
+    const navigate = useNavigate()
     const [snack, setSnack] = useState(false);
 
     const [snackType, setSnackType] = useState<AlertColor>('success');
@@ -180,6 +181,9 @@ export default function TableComponentStudents(props: Props) {
                             setShow={setDeleteModal}
                             setID={setStudentID}
                         />
+                        <Button onClick={() => navigate("/home/" + row.getValue('id'))} variant="contained" color="success">
+                            Подробнее
+                        </Button>
                     </div>
                 ),
             },
@@ -225,6 +229,7 @@ export default function TableComponentStudents(props: Props) {
         setSnack(true);
     }
 
+    console.log(studentID)
     return (
         <div>
             <SimpleSnackbar
@@ -239,6 +244,8 @@ export default function TableComponentStudents(props: Props) {
                 showHandler={setShowModal}
                 makeQuery={makeQuery}
             />
+
+
             <StudentDeleteModal
                 show={deleteModal}
                 id={studentID}
@@ -250,6 +257,7 @@ export default function TableComponentStudents(props: Props) {
                 table={table}
                 rows={table.getSelectedRowModel().flatRows}
             />
+
             {isPending ? (
                 <Loader />
             ) : (
