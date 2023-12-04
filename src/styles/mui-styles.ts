@@ -1,13 +1,22 @@
+import styled from '@emotion/styled';
+import { TableRow } from '@mui/material';
+
+export const bgColor = "#505269"
+export const btnColor = "#565EE2"
+export const lightBg = "#37384A"
+export const darkBg = "#272935"
+
+
 export const tableHeaderStyle = {
-    border : "1px solid rgb(34, 9, 44)",
+    border : "none",
     padding : 2,
-    backgroundColor : "rgb(82, 109, 130)",
-    color : "rgb(231, 246, 242)",
+    backgroundColor : darkBg,
+    color : "#fff",
     // minWidth : 200
 }
 
 export const tableCellStyle = {
-    border : "1px solid rgb(34, 9, 44)",
+    border : "none",
     padding : 2,
     backgroundColor : "rgb(157, 178, 191)",
     color : "rgb(39, 55, 77)",
@@ -28,8 +37,26 @@ export const modalStyle = {
     overflow : "scroll"
 }
 
+export const muiBtn = {
+    backgroundColor : btnColor,
+    // width : "fit-content",
+    color : "#fff"
+}
 
 
+export const TableRowStyled = styled(TableRow)`
+  &:nth-of-type(odd) {
+    background-color: #505269;
+    border-radius : 15px;
+  }
+  &:nth-of-type(even) {
+    background-color: #272935;
+    border-radius : 15px;
+  }
+  & > td {
+    color: white;
+  }
+`;
 
 export const modalInputLabel = {
     color : "#ffff",

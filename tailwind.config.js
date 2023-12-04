@@ -6,10 +6,10 @@ export default {
   theme: {
     extend: {
       colors: {
-        'dark-bg': '#27374D',
-        'dark-bg-meddium' : "#526D82",
-        'dark-bg-lite' : "#9DB2BF",
-        'dark-bg-text' : "#DDE6ED"
+        'dark-bg': '#272935',
+        'dark-bg-meddium' : "#37384A",
+        'dark-bg-lite' : "#505269",
+        'dark-bg-text' : "#fff"
       },
     },
   },

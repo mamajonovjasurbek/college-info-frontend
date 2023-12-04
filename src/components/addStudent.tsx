@@ -21,7 +21,7 @@ import { SimpleSnackbar } from './snackbar';
 import {createStudent, fetchGroups} from '../utils/https';
 import { IStudent } from '../types/student.ts';
 import { IGroup } from '../types/group.ts';
-import { modalStyle } from '../styles/mui-styles.ts';
+import { modalStyle, muiBtn } from '../styles/mui-styles.ts';
 import '../utils/date.css';
 import { queryClient } from '../main.tsx';
 import Cookies from 'universal-cookie';
@@ -153,9 +153,7 @@ export const AddStudent = memo(() => {
                 type={snackType}
             />
             <Button
-                sx={{
-                    width: 'fit-content',
-                }}
+                sx={muiBtn}
                 onClick={() => {
                     setShow(true);
                     setIsGroupEnabled(true);
@@ -402,6 +400,7 @@ export const AddStudent = memo(() => {
                                ` </Grid>
                             </Grid>
                             <Button
+                                sx = {muiBtn}
                                 type="submit"
                                 variant="contained">
                                 Создать

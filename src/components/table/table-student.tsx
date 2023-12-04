@@ -21,7 +21,7 @@ import {
 
 import Filter from '../filter.tsx';
 import { Pagination } from '../pagination.tsx';
-import { tableCellStyle, tableHeaderStyle } from '../../styles/mui-styles.ts';
+import { tableHeaderStyle, TableRowStyled } from '../../styles/mui-styles.ts';
 import { queryClient } from '../../main.tsx';
 import { useMutation } from '@tanstack/react-query';
 import { postStudentsData } from '../../utils/https.ts';
@@ -231,7 +231,7 @@ export default function TableComponentStudents(props: Props) {
 
     console.log(studentID)
     return (
-        <div>
+        <div className="p-10 bg-dark-bg rounded-3xl">
             <SimpleSnackbar
                 show={snack}
                 handleOpen={setSnack}
@@ -268,6 +268,12 @@ export default function TableComponentStudents(props: Props) {
                         handleRowSelectionData={handleRowSelectionData}
                     />
                     <TableContainer
+                        sx ={
+                        {
+                            borderRadius : "0px",
+                            border : "none"
+                        }
+                        }
                         variant="outlined"
                         component={Paper}>
                         <Table>
@@ -313,13 +319,15 @@ export default function TableComponentStudents(props: Props) {
                             <TableBody>
                                 {table.getRowModel().rows.map((row) => {
                                     return (
-                                        <TableRow key={row.id}>
+                                        <TableRowStyled key={row.id}>
                                             {row
                                                 .getVisibleCells()
                                                 .map((cell) => {
                                                     return (
                                                         <TableCell
-                                                            sx={tableCellStyle}
+                                                            sx = {{
+                                                                border : "none"
+                                                            }}
                                                             key={cell.id}>
                                                             {flexRender(
                                                                 cell.column
@@ -330,7 +338,7 @@ export default function TableComponentStudents(props: Props) {
                                                         </TableCell>
                                                     );
                                                 })}
-                                        </TableRow>
+                                        </TableRowStyled>
                                     );
                                 })}
                             </TableBody>
