@@ -21,7 +21,6 @@ const style = {
     transform: 'translate(-50%, -50%)',
     width: 400,
     bgcolor: 'background.paper',
-    border: '2px solid #000',
     boxShadow: 24,
     p: 4,
 };
@@ -39,6 +38,9 @@ export const StudentSelectedDeleteModal  = memo(({ rows, show, showHandler , tab
         onSuccess: () => {
             queryClient.invalidateQueries({
                 queryKey: ['students'],
+            });
+            queryClient.invalidateQueries({
+                queryKey: ['notifications'],
             });
             handleClose();
             setSnackMessage('Студент удален успешно');
@@ -95,7 +97,7 @@ export const StudentSelectedDeleteModal  = memo(({ rows, show, showHandler , tab
                     <Box sx={style}>
                         <Typography
                             variant="h5"
-                            className="text-dark-bg text-center">
+                            className="text-center">
                             Удалить  {rows.length > 1  ? "студентов" : "студента"}
                         </Typography>
 

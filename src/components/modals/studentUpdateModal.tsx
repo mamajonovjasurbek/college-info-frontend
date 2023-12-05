@@ -23,6 +23,9 @@ import { IStudent } from '../../types/student';
 import { IGroup } from '../../types/group';
 import { queryClient } from '../../main';
 import {DragDrop} from "../dragDrop.tsx";
+import {muiBtn} from "../../styles/mui-styles.ts";
+import Cookies from "universal-cookie";
+// import {useCookies} from "react-cookie";
 
 interface IProps {
     show: boolean;
@@ -43,6 +46,11 @@ const style = {
 };
 
 export const StudentUpdateModal = memo((props: IProps) => {
+    const cookies = new Cookies();
+
+    const groupCookie = cookies.get('group');
+
+    const groupIDCookie = cookies.get('groupID');
 
     const {
         data: studentData,
@@ -61,7 +69,7 @@ export const StudentUpdateModal = memo((props: IProps) => {
     } = useQuery({
         queryKey: ['groups'],
         queryFn: fetchGroups,
-        enabled: props.makeQuery,
+        enabled: props.makeQuery && groupCookie == ('admin' as string),
     });
 
 
@@ -80,7 +88,10 @@ export const StudentUpdateModal = memo((props: IProps) => {
         mutationFn: updateStudentByID,
         onSuccess: () => {
             queryClient.invalidateQueries({
-                queryKey: ['students'],
+                queryKey: ['students' ] ,
+            });
+            queryClient.invalidateQueries({
+                queryKey: ['notifications' ] ,
             });
             handleClose();
             setSnackMessage('Данные пользователя изменены успешно');
@@ -113,6 +124,10 @@ export const StudentUpdateModal = memo((props: IProps) => {
 
     const onSubmit = (data: IStudent) => {
         const formData = new FormData();
+        const group: string =
+            groupCookie != ('admin' as string)
+                ? (groupIDCookie as string)
+                : data.group;
 
         formData.append('location', data.location);
         formData.append('study_dir', data.study_dir);
@@ -153,7 +168,7 @@ export const StudentUpdateModal = memo((props: IProps) => {
                                 <CircularProgress />
                             </Box>
                         ))}
-                    {groupsDatas && studentData && (
+                    {studentData && (
                         <Box sx={style}>
                             <form
                                 onSubmit={handleSubmit(onSubmit)}
@@ -239,32 +254,35 @@ export const StudentUpdateModal = memo((props: IProps) => {
                                             {...register('course')}
                                         />
                                     </Grid>
-                                    <Grid item xs={6}>
-                                        <InputLabel
-                                            className="text-sky-500"
-                                            htmlFor="group">
-                                            Группа
-                                        </InputLabel>
-                                        <Select
-                                            fullWidth
-                                            labelId="group-select"
-                                            id="group-select"
-                                            value={group}
-                                            label="Группа"
-                                            {...register('group', { required: true })}
-                                            onChange={handleChangeGroup}>
-                                            {...groupsDatas?.length &&
-                                            groupsDatas.map((item: IGroup) => {
-                                                return (
-                                                    <MenuItem
-                                                        key={item.id}
-                                                        value={item.id}>
-                                                        <em>{item?.name}</em>
-                                                    </MenuItem>
-                                                );
-                                            })}
-                                        </Select>
-                                    </Grid>
+                                    {groupCookie == ("admin" as string) && (
+                                        <Grid item xs={6}>
+                                            <InputLabel
+                                                className="text-sky-500"
+                                                htmlFor="group">
+                                                Группа
+                                            </InputLabel>
+                                            <Select
+                                                required
+                                                fullWidth
+                                                labelId="group-select"
+                                                id="group-select"
+                                                value={group}
+                                                label="Группа"
+                                                {...register('group', { required: true })}
+                                                onChange={handleChangeGroup}>
+                                                {...groupsDatas?.length &&
+                                                groupsDatas.map((item: IGroup) => {
+                                                    return (
+                                                        <MenuItem
+                                                            key={item.id}
+                                                            value={item.id}>
+                                                            <em>{item?.name}</em>
+                                                        </MenuItem>
+                                                    );
+                                                })}
+                                            </Select>
+                                        </Grid>
+                                    )}
 
                                     <Grid
                                         item
@@ -290,8 +308,8 @@ export const StudentUpdateModal = memo((props: IProps) => {
                                     </div>
                                 </Grid>
                                 <Button
-                                    disabled={group == ''}
                                     type="submit"
+                                    sx ={muiBtn}
                                     variant="contained">
                                     Изменить
                                 </Button>

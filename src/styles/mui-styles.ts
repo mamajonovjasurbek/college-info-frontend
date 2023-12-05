@@ -2,9 +2,9 @@ import styled from '@emotion/styled';
 import { TableRow } from '@mui/material';
 
 export const bgColor = "#505269"
-export const btnColor = "#565EE2"
+export const btnColor = "#01987A"
 export const lightBg = "#37384A"
-export const darkBg = "#272935"
+export const darkBg = "#01987A"
 
 
 export const tableHeaderStyle = {
@@ -46,12 +46,21 @@ export const muiBtn = {
 
 export const TableRowStyled = styled(TableRow)`
   &:nth-of-type(odd) {
-    background-color: #505269;
+    background-color: #fff;
     border-radius : 15px;
+    td {
+    color : #333;
+      font-weight : 600;
+    }
   }
   &:nth-of-type(even) {
-    background-color: #272935;
+    background-color: #F3F3F3;
     border-radius : 15px;
+    color : #01987A;
+    td {
+    font-weight : 600;
+      color : #01987A;
+    }
   }
   & > td {
     color: white;

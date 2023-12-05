@@ -15,6 +15,8 @@ import { useForm } from 'react-hook-form';
 import { IUserPassword } from '../../types/user';
 import { updateUserByID } from '../../utils/https';
 import { SimpleSnackbar } from '../snackbar';
+import {queryClient} from "../../main.tsx";
+// import {useCookies} from "react-cookie";
 
 interface IProps {
     show: boolean;
@@ -33,6 +35,8 @@ const style = {
 };
 
 export const UserUpdateModal = memo((props: IProps) => {
+    // const [roleCookies] = useCookies(['role']);
+
     const [same, setSame] = useState(true);
 
     const [snack, setSnack] = useState(false);
@@ -46,6 +50,9 @@ export const UserUpdateModal = memo((props: IProps) => {
     const { mutate, isError, isPending } = useMutation({
         mutationFn: updateUserByID,
         onSuccess: () => {
+            queryClient.invalidateQueries({
+                queryKey: ['notifications'] ,
+            })
             handleClose();
             setSnackMessage('Пароль пользователя изменен успешно');
             setSnackType('success');
@@ -100,7 +107,7 @@ export const UserUpdateModal = memo((props: IProps) => {
                             className="border-2 p-10 rounded-lg flex flex-col gap-3">
                             <Typography
                                 variant="h5"
-                                className="text-dark-bg text-center">
+                                className="text-center">
                                 Изменить пароль
                             </Typography>
                             <InputLabel

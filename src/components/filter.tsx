@@ -14,14 +14,14 @@ export default function Filter({
             <TextField
                 sx={{
                     width: '100%',
-                    backgroundColor: 'rgb(231, 246, 242)',
+                    backgroundColor: '#fff',
                     minWidth: 150,
                 }}
                 variant="outlined"
                 id="outlined-basic"
                 value={(column.getFilterValue() ?? '') as string}
                 onChange={(e) => column.setFilterValue(e.target.value)}
-                placeholder={`Search...`}
+                placeholder={`Поиск...`}
                 className="w-36 border shadow rounded"
             />
         </div>

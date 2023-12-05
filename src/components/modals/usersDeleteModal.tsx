@@ -43,7 +43,10 @@ export const UsersDeleteModal = memo((props: IProps) => {
         onSuccess: () => {
             queryClient.invalidateQueries({
                 queryKey: ['users'],
-            });
+            })
+            queryClient.invalidateQueries({
+                queryKey: ['notifications'] ,
+            })
             handleClose();
             setSnackMessage('Пользователь удален успешно');
             setSnackType('success');
@@ -86,7 +89,7 @@ export const UsersDeleteModal = memo((props: IProps) => {
                     <Box sx={style}>
                         <Typography
                             variant="h5"
-                            className="text-dark-bg text-center">
+                            className="text-center">
                             Удалить пользователя
                         </Typography>
 

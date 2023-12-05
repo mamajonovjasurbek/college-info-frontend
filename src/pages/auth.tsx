@@ -15,6 +15,7 @@ import { useMutation } from '@tanstack/react-query';
 import axios from 'axios';
 import { useCookies } from 'react-cookie';
 import { useEffect } from 'react';
+import {muiBtn} from "../styles/mui-styles.ts";
 
 const instance = axios.create({
     baseURL: 'http://localhost:5000',
@@ -110,7 +111,7 @@ export const Auth = () => {
                     <>
                         <Typography
                             variant="h5"
-                            className="text-dark-bg text-center">
+                            className="text-center">
                             Авторизация
                         </Typography>
                         <InputLabel
@@ -142,7 +143,9 @@ export const Auth = () => {
                         />
                         <Button
                             type="submit"
-                            variant="contained">
+                            variant="contained"
+                            sx = {muiBtn}
+                        >
                             Отправить
                         </Button>
                         {isError && (

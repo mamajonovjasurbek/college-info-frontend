@@ -211,8 +211,6 @@ export default function TableComponentStudents(props: Props) {
             students.push(table.getSelectedRowModel().flatRows[i].original);
         }
 
-        console.log(students);
-
         mutate(students);
         table.toggleAllPageRowsSelected(false);
     };
@@ -228,10 +226,8 @@ export default function TableComponentStudents(props: Props) {
         setSnackType('error');
         setSnack(true);
     }
-
-    console.log(studentID)
     return (
-        <div className="p-10 bg-dark-bg rounded-3xl">
+        <div className="p-10  rounded-3xl shadow">
             <SimpleSnackbar
                 show={snack}
                 handleOpen={setSnack}

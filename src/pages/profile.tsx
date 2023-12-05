@@ -11,6 +11,7 @@ import {getStudentByID, getStudentImageByID} from "../utils/https.ts";
 import {useQuery} from "@tanstack/react-query";
 import ErrorPage from "./error.tsx";
 import {Loader} from "../components/loader.tsx";
+import {muiBtn} from "../styles/mui-styles.ts";
 export default function ProfilePage() {
     const navigate  = useNavigate()
     const {id} = useParams()
@@ -62,7 +63,7 @@ export default function ProfilePage() {
                 {studentData && (
                     <Card>
                         <Box sx={{ mb: 1, display: 'flex', alignItems: 'center', gap: 2 }}>
-                            <Button variant="contained" color="info" onClick={() => navigate("/home")}>
+                            <Button sx={muiBtn} variant="contained" color="info" onClick={() => navigate("/home")}>
                                 <ArrowBackIcon />
                             </Button>
                             <Typography variant="h6">Данные</Typography>
@@ -205,7 +206,7 @@ export default function ProfilePage() {
                                         </Box>
                                     </Stack>
                                 </div>
-                                <Link className="w-full" to="/home" ><Button fullWidth variant="contained">Назад</Button></Link>
+                                <Link className="w-full" to="/home" ><Button sx={muiBtn} fullWidth variant="contained">Назад</Button></Link>
                             </Stack>
                         </Stack>
                     </Card>

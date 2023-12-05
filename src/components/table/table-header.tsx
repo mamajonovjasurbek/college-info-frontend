@@ -12,7 +12,7 @@ interface IProps {
 
 export const TableHeader = (props: IProps) => {
     return (
-        <div className="flex items-center gap-4 mb-4 text-dark-bg-text">
+        <div className="flex items-center gap-4 mb-4 text-dark-bg-lite">
             Перейти на страницу:
             <input
                 type="number"

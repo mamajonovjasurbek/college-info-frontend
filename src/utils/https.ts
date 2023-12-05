@@ -307,3 +307,34 @@ export async function deleteSelectedStudent(id: string[]) {
 
     return response.data;
 }
+
+export async function fetchNotifications() {
+    const cookies = new Cookies();
+    const token = cookies.get('Authorization');
+
+    const response = await instance<INotification[]>({
+        method: 'get',
+        url: '/notifications',
+        headers: {
+            Authorization: `Bearer ${token}`,
+        },
+    });
+
+    return response.data;
+}
+
+export async function viewNotifications(data : INotification[]) {
+    const cookies = new Cookies();
+    const token = cookies.get('Authorization');
+
+    const response = await instance<INotification[]>({
+        method: 'post',
+        url: '/notifications/view',
+        data : data,
+        headers: {
+            Authorization: `Bearer ${token}`,
+        },
+    });
+
+    return response.data;
+}

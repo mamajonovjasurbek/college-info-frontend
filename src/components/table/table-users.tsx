@@ -22,7 +22,7 @@ import { Pagination } from '../pagination.tsx';
 
 import { useMemo, useState } from 'react';
 import { queryClient } from '../../main.tsx';
-import { tableCellStyle } from '../../styles/mui-styles.ts';
+import { tableHeaderStyle, TableRowStyled} from '../../styles/mui-styles.ts';
 import { UsersDeleteModal } from '../modals/usersDeleteModal.tsx';
 import { UserUpdateModal } from '../modals/usersUpdateModal.tsx';
 import { TableHeader } from './table-header.tsx';
@@ -153,15 +153,7 @@ export default function TableComponentUsers(props: Props) {
                                 {headerGroup.headers.map((header) => {
                                     return (
                                         <TableCell
-                                            sx={{
-                                                // backgroundColor: "rgba(255,255,255,1)",
-                                                border: '1px solid rgb(34, 9, 44)',
-                                                padding: 2,
-                                                backgroundColor:
-                                                    'rgb(82, 109, 130)',
-                                                color: 'rgb(231, 246, 242)',
-                                                // minWidth : 200
-                                            }}
+                                            sx={tableHeaderStyle}
                                             size="medium"
                                             key={header.id}
                                             colSpan={header.colSpan}>
@@ -194,11 +186,10 @@ export default function TableComponentUsers(props: Props) {
                     <TableBody>
                         {table.getRowModel().rows.map((row) => {
                             return (
-                                <TableRow key={row.id}>
+                                <TableRowStyled key={row.id}>
                                     {row.getVisibleCells().map((cell) => {
                                         return (
                                             <TableCell
-                                                sx={tableCellStyle}
                                                 key={cell.id}>
                                                 {flexRender(
                                                     cell.column.columnDef.cell,
@@ -207,7 +198,7 @@ export default function TableComponentUsers(props: Props) {
                                             </TableCell>
                                         );
                                     })}
-                                </TableRow>
+                                </TableRowStyled>
                             );
                         })}
                     </TableBody>

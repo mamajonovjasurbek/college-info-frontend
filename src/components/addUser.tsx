@@ -19,7 +19,7 @@ import { useForm } from 'react-hook-form';
 import { IGroup } from '../types/group.ts';
 import { ICreateUser } from '../types/user.ts';
 import { queryClient } from '../main.tsx';
-import { modalStyle } from '../styles/mui-styles.ts';
+import {modalStyle, muiBtn} from '../styles/mui-styles.ts';
 import ErrorPage from '../pages/error.tsx';
 import { SimpleSnackbar } from './snackbar.tsx';
 
@@ -61,6 +61,9 @@ export const AddUserComponent = memo(() => {
                     queryKey: ['users'],
                 })
                 .then((r) => console.log(r));
+            queryClient.invalidateQueries({
+                queryKey: ['notifications'] ,
+            });
             handleClose();
             setSnackMessage('Пользователь добавлен успешно');
             setSnackType('success');
@@ -115,9 +118,7 @@ export const AddUserComponent = memo(() => {
                 type={snackType}
             />
             <Button
-                sx={{
-                    width: 'fit-content',
-                }}
+                sx={muiBtn}
                 onClick={() => {
                     setShow(true);
                     setIsGroupEnabled(true);

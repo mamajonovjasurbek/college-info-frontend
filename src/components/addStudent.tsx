@@ -90,6 +90,9 @@ export const AddStudent = memo(() => {
                     queryKey: ['students'],
                 })
                 .then((r) => console.log(r));
+                queryClient.invalidateQueries({
+                    queryKey: ['notifications' ] ,
+                });
             handleClose();
             setSnackMessage('Студент добавлен успешно');
             setSnackType('success');
