@@ -1,4 +1,4 @@
-interface INotification {
+export interface INotification {
     id  : string,
     name : string,
     item_id : number,

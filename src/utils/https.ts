@@ -1,8 +1,9 @@
 import Cookies from 'universal-cookie';
 import { IStudent } from '../types/student';
-import { ICreateUser, IUser, IUserPassword } from '../types/user';
+import {ICreateUser, IUserPassword} from '../types/user';
 import { saveAs } from 'file-saver';
 import axios from 'axios';
+import {INotification} from "../types/notification.ts";
 
 const instance = axios.create({
     baseURL: 'http://localhost:5000/',
@@ -52,13 +53,13 @@ export async function updateUserByID({ id, data }: IUpdateUserProps) {
         },
     });
 
-    return response.data;
+    return response.data.data;
 }
 
 export async function getStudents() {
     const cookies = new Cookies();
     const token = cookies.get('Authorization');
-    const response = await instance.get<IStudent[]>('/students', {
+    const response = await instance.get('/students', {
         method: 'GET',
         headers: {
             Authorization: `Bearer ${token}`,
@@ -69,21 +70,21 @@ export async function getStudents() {
         throw new Error('auth');
     }
 
-    return response.data;
+    return response.data.data;
 }
 
 export async function getUsers() {
     const cookies = new Cookies();
     const token = cookies.get('Authorization');
 
-    const response = await instance.get<IUser[]>('/users', {
+    const response = await instance.get('/users', {
         method: 'GET',
         headers: {
             Authorization: `Bearer ${token}`,
         },
     });
 
-    return response.data;
+    return response.data.data;
 }
 
 export async function deleteUserById(id: string) {
@@ -98,7 +99,7 @@ export async function deleteUserById(id: string) {
         },
     });
 
-    return response.data;
+    return response.data.data;
 }
 
 export async function fetchGroups() {
@@ -113,7 +114,7 @@ export async function fetchGroups() {
         },
     });
 
-    return response.data;
+    return response.data.data;
 }
 
 export async function createUser(data: ICreateUser) {
@@ -135,14 +136,14 @@ export async function createUser(data: ICreateUser) {
         },
     });
 
-    return response.data;
+    return response.data.data;
 }
 
 export async function postStudentsData(data: IStudent[]) {
     const cookies = new Cookies();
     const token = cookies.get('Authorization');
 
-    await instance<IStudent[]>({
+    await instance({
         url: '/students/excel',
         method: 'POST',
         data: data,
@@ -152,7 +153,6 @@ export async function postStudentsData(data: IStudent[]) {
         responseType: 'blob',
     }).then((result) => {
         console.log(result);
-        // @ts-ignore
         saveAs(result.data, 'result.xlsx');
     });
 }
@@ -169,7 +169,7 @@ export async function deleteStudentByID(id: string) {
         },
     });
 
-    return response.data;
+    return response.data.data;
 }
 
 interface IUpdateProps {
@@ -198,7 +198,7 @@ export async function updateStudentByIDOld({ id, data }: IUpdateProps) {
         },
     });
 
-    return response.data;
+    return response.data.data;
 }
 
 interface  IUpdateWithImageProps{
@@ -221,7 +221,7 @@ export async function updateStudentByID({ id, data }: IUpdateWithImageProps) {
         },
     });
 
-    return response.data;
+    return response.data.data;
 }
 
 export async function getStudentByID(id: string) {
@@ -270,7 +270,7 @@ export async function createStudentOld(data: IStudent) {
         },
     });
 
-    return response.data;
+    return response.data.data;
 }
 
 export async function createStudent(data: FormData) {
@@ -288,7 +288,7 @@ export async function createStudent(data: FormData) {
             'Content-Type': 'multipart/form-data',
         },
     });
-    return response.data;
+    return response.data.data;
 }
 
 
@@ -305,14 +305,14 @@ export async function deleteSelectedStudent(id: string[]) {
         },
     });
 
-    return response.data;
+    return response.data.data;
 }
 
 export async function fetchNotifications() {
     const cookies = new Cookies();
     const token = cookies.get('Authorization');
 
-    const response = await instance<INotification[]>({
+    const response = await instance({
         method: 'get',
         url: '/notifications',
         headers: {
@@ -320,14 +320,14 @@ export async function fetchNotifications() {
         },
     });
 
-    return response.data;
+    return response.data.data;
 }
 
 export async function viewNotifications(data : INotification[]) {
     const cookies = new Cookies();
     const token = cookies.get('Authorization');
 
-    const response = await instance<INotification[]>({
+    const response = await instance({
         method: 'post',
         url: '/notifications/view',
         data : data,
@@ -336,5 +336,5 @@ export async function viewNotifications(data : INotification[]) {
         },
     });
 
-    return response.data;
+    return response.data.data;
 }

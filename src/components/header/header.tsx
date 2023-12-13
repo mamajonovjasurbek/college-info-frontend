@@ -24,6 +24,7 @@ import {fetchNotifications, viewNotifications} from "../../utils/https.ts";
 import {Notification} from "../notification.tsx";
 import {SimpleSnackbar} from "../snackbar.tsx";
 import {queryClient} from "../../main.tsx";
+import {INotification} from "../../types/notification.ts";
 
 export const Header = memo(() => {
     const [exit, setExit] = useState(false);
@@ -130,7 +131,7 @@ export const Header = memo(() => {
                                 </Box>
                                 ): (
                                 <div className="max-h-[400px] w-fit overflow-y-scroll">
-                                    {data && data.length ? data.map((item) =>{
+                                    {data && data.length ? data.map((item : INotification) =>{
                                         return(
                                             <MenuItem key={item.id} onClick={handleClose}><Notification data={item}/></MenuItem>
                                         )
