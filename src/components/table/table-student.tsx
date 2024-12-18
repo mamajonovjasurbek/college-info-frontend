@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { IBirthDate, IStudent } from '../../types/student.ts';
+import {IStudent } from '../../types/student.ts';
 import {
     ColumnDef,
     flexRender,
@@ -16,15 +16,15 @@ import {
     TableContainer,
     TableHead,
     TableRow,
-    AlertColor, Button,
+    AlertColor, Button, Box, TextField,
 } from '@mui/material';
 
 import Filter from '../filter.tsx';
 import { Pagination } from '../pagination.tsx';
-import { tableHeaderStyle, TableRowStyled } from '../../styles/mui-styles.ts';
+import {muiBtn, tableHeaderStyle, TableRowStyled} from '../../styles/mui-styles.ts';
 import { queryClient } from '../../main.tsx';
 import { useMutation } from '@tanstack/react-query';
-import { postStudentsData } from '../../utils/https.ts';
+import {postStudentsData, uploadStudentsExcel} from '../../utils/https.ts';
 import { SimpleSnackbar } from '../snackbar.tsx';
 import { IndeterminateCheckbox } from '../selectionCheck.tsx';
 import { TableHeader } from './table-header.tsx';
@@ -32,9 +32,9 @@ import { Loader } from '../loader.tsx';
 import { TableRowButton } from './row-button.tsx';
 import { StudentDeleteModal } from '../modals/studentDeleteModal.tsx';
 import { StudentSelectedDeleteModal } from '../modals/studentSelectedDeleteModal.tsx';
-import { cutDate } from '../../utils/helper-functions.ts';
 import {StudentUpdateModal} from "../modals/studentUpdateModal.tsx";
 import {useNavigate} from "react-router-dom";
+import {useCookies} from "react-cookie";
 
 type Props = {
     data: IStudent[];
@@ -43,6 +43,9 @@ type Props = {
 export default function TableComponentStudents(props: Props) {
     const [rowSelection, setRowSelection] = useState({});
     const navigate = useNavigate()
+
+    const [roleCookies] = useCookies(['role']);
+
     const [snack, setSnack] = useState(false);
 
     const [snackType, setSnackType] = useState<AlertColor>('success');
@@ -55,10 +58,13 @@ export default function TableComponentStudents(props: Props) {
 
     const [makeQuery, setMakeQuery] = useState(false);
 
-    const [deleteModal, setDeleteModal] = useState<boolean>(false);
+    const [deleteModal, setDeleteModal] = useState<boolean>(false)
 
     const [deleteSelectedModal, setDeleteSelectedModal] =
         useState<boolean>(false);
+
+    const [selectedFile, setSelectedFile] = useState<File>();
+
 
     const { mutate, isPending, isError } = useMutation({
         mutationFn: postStudentsData,
@@ -68,6 +74,36 @@ export default function TableComponentStudents(props: Props) {
             setSnack(true);
         },
     });
+
+
+    const {mutate: mutateExcel, isPending : mutateExcelPending, isError : mutateExcelIsError, error:mutateExcelError } = useMutation({
+        mutationFn: uploadStudentsExcel,
+        onSuccess: () => {
+            setSnackMessage('Excel файл успешно загружен');
+            setSnackType('success');
+            setSelectedFile(undefined)
+            setSnack(true);
+        },
+    });
+
+
+
+    const handleFileChange = (event:React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0];
+        setSelectedFile(file);
+    };
+
+    const handleUpload = () => {
+        if (selectedFile) {
+            let data = new FormData()
+
+            data.append("file" , selectedFile)
+
+           mutateExcel(data)
+        } else {
+            console.log('Файл не выбран');
+        }
+    };
 
     const data = useMemo(() => props.data, [props.data]);
 
@@ -109,12 +145,10 @@ export default function TableComponentStudents(props: Props) {
                 accessorKey: 'name',
                 cell: (info) => info.getValue(),
             },
-
             {
                 header: 'Дата рождения',
                 accessorKey: 'birth_date',
-                cell: (info) =>
-                    cutDate(info.getValue<IBirthDate>().String as string),
+                cell: (info) => info.getValue(),
             },
             {
                 header: 'Место рождения',
@@ -157,10 +191,9 @@ export default function TableComponentStudents(props: Props) {
                 accessorKey: 'mother',
                 cell: (info) => info.getValue(),
             },
-
             {
                 header: 'Группа',
-                accessorKey: 'group',
+                accessorKey: 'group_name',
                 cell: (info) => info.getValue(),
             },
             {
@@ -226,6 +259,12 @@ export default function TableComponentStudents(props: Props) {
         setSnackType('error');
         setSnack(true);
     }
+
+    if (mutateExcelIsError) {
+        setSnackMessage(mutateExcelError.message);
+        setSnackType('error');
+        setSnack(true);
+    }
     return (
         <div className="p-10  rounded-3xl shadow">
             <SimpleSnackbar
@@ -241,7 +280,6 @@ export default function TableComponentStudents(props: Props) {
                 makeQuery={makeQuery}
             />
 
-
             <StudentDeleteModal
                 show={deleteModal}
                 id={studentID}
@@ -253,8 +291,41 @@ export default function TableComponentStudents(props: Props) {
                 table={table}
                 rows={table.getSelectedRowModel().flatRows}
             />
+            {roleCookies.role as number === 1 && (
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2  , marginTop:2}}>
+                    <input
+                        style={{ display: 'none' }} // Скрываем input
+                        id="file-input"
+                        type="file"
+                        onChange={handleFileChange}
+                    />
+                    <label htmlFor="file-input">
+                        <Button variant="contained" component="span" sx={muiBtn}>
+                            Загрузка студентов через excel
+                        </Button>
+                    </label>
+                    {selectedFile && (
+                        <TextField
+                            value={selectedFile.name}
+                            InputProps={{
+                                readOnly: true,
+                            }}
+                            label="Выбранный файл"
+                            variant="outlined"
+                        />
+                    )}
+                    <Button
+                        variant="contained"
+                        sx={muiBtn}
+                        onClick={handleUpload}
+                        disabled={!selectedFile}
+                    >
+                        Загрузить
+                    </Button>
+                </Box>
+            )}
 
-            {isPending ? (
+            {isPending || mutateExcelPending ? (
                 <Loader />
             ) : (
                 <div className="mt-6">

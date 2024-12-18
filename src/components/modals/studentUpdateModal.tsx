@@ -3,29 +3,23 @@ import {
     AlertColor,
     Box,
     Button,
-    CircularProgress, Grid,
+    CircularProgress, Grid, Input,
     InputLabel,
-    MenuItem,
     Modal,
-    Select,
-    SelectChangeEvent, TextField,
+    TextField,
     Typography,
 } from '@mui/material';
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { Dispatch, SetStateAction, memo, useState } from 'react';
+import {Dispatch, SetStateAction, memo, useState, useEffect} from 'react';
 import { useForm } from 'react-hook-form';
 import {
-    fetchGroups,
-    getStudentByID, getStudentImageByID, updateStudentByID,
+    getStudentByID, updateStudentByID, updateStudentImage,
 } from '../../utils/https';
 import { SimpleSnackbar } from '../snackbar';
-import { IStudent } from '../../types/student';
-import { IGroup } from '../../types/group';
+import {IStudent, IUpdateStudent} from '../../types/student';
 import { queryClient } from '../../main';
 import {DragDrop} from "../dragDrop.tsx";
 import {muiBtn} from "../../styles/mui-styles.ts";
-import Cookies from "universal-cookie";
-// import {useCookies} from "react-cookie";
 
 interface IProps {
     show: boolean;
@@ -46,43 +40,15 @@ const style = {
 };
 
 export const StudentUpdateModal = memo((props: IProps) => {
-    const cookies = new Cookies();
-
-    const groupCookie = cookies.get('group');
-
-    const groupIDCookie = cookies.get('groupID');
-
     const {
         data: studentData,
         isLoading: isGetStudentLoading,
         isError: isGetStudentError,
     } = useQuery({
-        queryKey: ['students', props.id],
+        queryKey: ['student', props.id],
         queryFn: () => getStudentByID(props.id),
         enabled: props.makeQuery,
     });
-
-    const {
-        data: groupsDatas,
-        isLoading: isGroupsLoading,
-        isError: isGroupsError,
-    } = useQuery({
-        queryKey: ['groups'],
-        queryFn: fetchGroups,
-        enabled: props.makeQuery && groupCookie == ('admin' as string),
-    });
-
-
-    const {
-        data: imageData,
-        isLoading: isImageLoading,
-        isError: isImageError,
-    } = useQuery({
-        queryKey: ['image' , props.id] ,
-        queryFn: () => getStudentImageByID(props.id),
-        enabled: props.makeQuery,
-    });
-
 
     const { mutate, isError, isPending } = useMutation({
         mutationFn: updateStudentByID,
@@ -96,10 +62,24 @@ export const StudentUpdateModal = memo((props: IProps) => {
             handleClose();
             setSnackMessage('Данные пользователя изменены успешно');
             setSnackType('success');
-            setGroup('');
             setSnack(true);
         },
     });
+
+
+    const { mutate : mutateUpdateImage , isPending: isErrorUpdateImage,
+                    isError: isPendingUpdateImage } = useMutation({
+        mutationFn: updateStudentImage,
+        onSuccess: () => {
+            queryClient.invalidateQueries({
+                queryKey: ['student'] ,
+            });
+            setSnackMessage('Изображение изменено успешно');
+            setSnackType('success');
+            setSnack(true);
+        },
+    });
+
     const [files, setFiles] = useState<(File & {preview:string})[]>([]);
 
     const [snack, setSnack] = useState(false);
@@ -110,42 +90,35 @@ export const StudentUpdateModal = memo((props: IProps) => {
 
     const { register, handleSubmit, reset } = useForm<IStudent>();
 
-    const [group, setGroup] = useState('');
-
-    const handleChangeGroup = (event: SelectChangeEvent) => {
-        setGroup(event.target.value);
-    };
-
     const handleClose = () => {
         props.showHandler(false);
         setFiles([])
         reset();
     };
 
-    const onSubmit = (data: IStudent) => {
-        const formData = new FormData();
-        const group: string =
-            groupCookie != ('admin' as string)
-                ? (groupIDCookie as string)
-                : data.group;
-
-        formData.append('location', data.location);
-        formData.append('study_dir', data.study_dir);
-        formData.append('course', data.course);
-        formData.append('group', group);
-        formData.append("image" , files[0])
-
-        if (data && props.id) {
-            mutate({ id: props.id, data: formData });
-        }
+    const onSubmit = (data: IUpdateStudent) => {
+        // @ts-ignore
+        data.id = studentData?.id;
+        mutate(data);
     };
 
-    if (isError || isGetStudentError || isGroupsError || isImageError) {
-        handleClose();
-        setSnackMessage('Ошибка при изменении данных студента');
-        setSnackType('error');
-        setSnack(true);
-    }
+    useEffect(() => {
+        if (isError || isGetStudentError  || isErrorUpdateImage) {
+            setSnackMessage('Ошибка при изменении данных студента');
+            setSnackType('error');
+            setSnack(true);
+        }
+    }, [isError, isGetStudentError, isErrorUpdateImage]);
+
+    useEffect(() => {
+        if (files.length > 0 && studentData?.id) {
+            const formData = new FormData();
+            formData.append('id', studentData.id);
+            formData.append('file', files[0]);
+
+            mutateUpdateImage(formData);
+        }
+    }, [files, studentData?.id]); // Добавлено studentData?.id
 
     return (
         <>
@@ -161,13 +134,11 @@ export const StudentUpdateModal = memo((props: IProps) => {
                 aria-labelledby="modal-modal-title"
                 aria-describedby="modal-modal-description">
                 <>
-                    {isPending ||
-                        isGetStudentLoading ||
-                        (isGroupsLoading || isImageLoading && (
-                            <Box sx={{ display: 'flex' }}>
-                                <CircularProgress />
-                            </Box>
-                        ))}
+                    {(isPending || isGetStudentLoading  || isPendingUpdateImage) && (
+                        <Box sx={{ display: 'flex' }}>
+                            <CircularProgress />
+                        </Box>
+                    )}
                     {studentData && (
                         <Box sx={style}>
                             <form
@@ -175,10 +146,42 @@ export const StudentUpdateModal = memo((props: IProps) => {
                                 className="border-2 p-10 rounded-lg flex flex-col gap-6">
                                 <Typography
                                     variant="h5"
-                                    className="text-dark-bg text-center">
+                                    className="text-dark text-center">
                                     Изменение данных
                                 </Typography>
                                 <Grid container spacing={2}>
+                                    <Grid item xs={6}>
+                                        <InputLabel
+                                            className="text-sky-500"
+                                            htmlFor="location">
+                                            ФИО
+                                        </InputLabel>
+                                        <TextField
+                                            required={true}
+                                            fullWidth
+                                            variant="outlined"
+                                            defaultValue={studentData.name}
+                                            placeholder="Введите место жительства"
+                                            id="location"
+                                            {...register('name')}
+                                        />
+                                    </Grid>
+                                    <Grid item xs={6}>
+                                        <InputLabel
+                                            className="text-sky-500"
+                                            htmlFor="location">
+                                            Дата рождения
+                                        </InputLabel>
+                                        <Input
+                                            fullWidth
+                                            type="date"
+                                            className="date"
+                                            defaultValue={studentData.birth_date}
+                                            placeholder="Введите место жительства"
+                                            id="location"
+                                            {...register('birth_date')}
+                                        />
+                                    </Grid>
                                     <Grid item xs={6}>
                                         <InputLabel
                                             className="text-sky-500"
@@ -188,7 +191,7 @@ export const StudentUpdateModal = memo((props: IProps) => {
                                         <TextField
                                             fullWidth
                                             variant="outlined"
-                                            defaultValue={studentData.data.location}
+                                            defaultValue={studentData.location}
                                             placeholder="Введите место жительства"
                                             id="location"
                                             {...register('location')}
@@ -203,7 +206,7 @@ export const StudentUpdateModal = memo((props: IProps) => {
                                         <TextField
                                             fullWidth
                                             variant="outlined"
-                                            defaultValue={studentData.data.pass_number}
+                                            defaultValue={studentData.pass_number}
                                             placeholder="Введите номер паспорта"
                                             id="pass_number"
                                             {...register('pass_number')}
@@ -218,7 +221,7 @@ export const StudentUpdateModal = memo((props: IProps) => {
                                         <TextField
                                             fullWidth
                                             variant="outlined"
-                                            defaultValue={studentData.data.phone_number}
+                                            defaultValue={studentData.phone_number}
                                             placeholder="Введите номер телефона"
                                             id="phone_number"
                                             {...register('phone_number')}
@@ -233,7 +236,7 @@ export const StudentUpdateModal = memo((props: IProps) => {
                                         <TextField
                                             fullWidth
                                             variant="outlined"
-                                            defaultValue={studentData.data.study_dir}
+                                            defaultValue={studentData.study_dir}
                                             placeholder="Введите направление"
                                             id="study_dir"
                                             {...register('study_dir')}
@@ -242,48 +245,48 @@ export const StudentUpdateModal = memo((props: IProps) => {
                                     <Grid item xs={6}>
                                         <InputLabel
                                             className="text-sky-500"
-                                            htmlFor="course">
-                                            Курс
+                                            htmlFor="study_dir">
+                                            Направление
                                         </InputLabel>
                                         <TextField
                                             fullWidth
                                             variant="outlined"
-                                            defaultValue={studentData.data.course}
-                                            placeholder="Введите курс"
-                                            id="course"
-                                            {...register('course')}
+                                            defaultValue={studentData.study_dir}
+                                            placeholder="Введите направление"
+                                            id="study_dir"
+                                            {...register('study_dir')}
                                         />
                                     </Grid>
-                                    {groupCookie == ("admin" as string) && (
-                                        <Grid item xs={6}>
-                                            <InputLabel
-                                                className="text-sky-500"
-                                                htmlFor="group">
-                                                Группа
-                                            </InputLabel>
-                                            <Select
-                                                required
-                                                fullWidth
-                                                labelId="group-select"
-                                                id="group-select"
-                                                value={group}
-                                                label="Группа"
-                                                {...register('group', { required: true })}
-                                                onChange={handleChangeGroup}>
-                                                {...groupsDatas?.length &&
-                                                groupsDatas.map((item: IGroup) => {
-                                                    return (
-                                                        <MenuItem
-                                                            key={item.id}
-                                                            value={item.id}>
-                                                            <em>{item?.name}</em>
-                                                        </MenuItem>
-                                                    );
-                                                })}
-                                            </Select>
-                                        </Grid>
-                                    )}
-
+                                    <Grid item xs={6}>
+                                        <InputLabel
+                                            className="text-sky-500"
+                                            htmlFor="study_dir">
+                                            Мама
+                                        </InputLabel>
+                                        <TextField
+                                            fullWidth
+                                            variant="outlined"
+                                            defaultValue={studentData.mother}
+                                            placeholder="Введите направление"
+                                            id="study_dir"
+                                            {...register('mother')}
+                                        />
+                                    </Grid>
+                                    <Grid item xs={6}>
+                                        <InputLabel
+                                            className="text-sky-500"
+                                            htmlFor="study_dir">
+                                            Отец
+                                        </InputLabel>
+                                        <TextField
+                                            fullWidth
+                                            variant="outlined"
+                                            defaultValue={studentData.father}
+                                            placeholder="Введите направление"
+                                            id="study_dir"
+                                            {...register('father')}
+                                        />
+                                    </Grid>
                                     <Grid
                                         item
                                         xs={12}>
@@ -304,7 +307,7 @@ export const StudentUpdateModal = memo((props: IProps) => {
                                         Текущее изображение
                                     </InputLabel>
                                     <div className="w-full flex justify-center">
-                                        <img src={imageData && imageData.size > 0   ? URL.createObjectURL(imageData) : "/unknown-double.jpg"} alt="student-image"/>
+                                        <img src={studentData.image.url != ""  ? studentData.image.url  : "/unknown-double.jpg"} alt="student-image"/>
                                     </div>
                                 </Grid>
                                 <Button

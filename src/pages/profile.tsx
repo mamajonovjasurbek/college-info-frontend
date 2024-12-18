@@ -5,9 +5,9 @@ import FormLabel from '@mui/joy/FormLabel';
 import Stack from '@mui/joy/Stack';
 import Card from '@mui/joy/Card';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import {Button, CircularProgress, Typography} from '@mui/material';
+import {Button, Typography} from '@mui/material';
 import {Link, useNavigate, useParams} from "react-router-dom";
-import {getStudentByID, getStudentImageByID} from "../utils/https.ts";
+import {getStudentByID} from "../utils/https.ts";
 import {useQuery} from "@tanstack/react-query";
 import ErrorPage from "./error.tsx";
 import {Loader} from "../components/loader.tsx";
@@ -27,24 +27,12 @@ export default function ProfilePage() {
         queryFn: () => getStudentByID(id as string ),
     });
 
-    const {
-        data: imageData,
-        isLoading: isImageLoading,
-        isError: isImageError,
-        error : imageError
-    } = useQuery({
-        queryKey: ['image' , id] ,
-        queryFn: () => getStudentImageByID(id as string),
-    });
-
-    if(isGetStudentError || isImageError){
-        <ErrorPage err={getStudentError || imageError }/>
+    if(isGetStudentError){
+        <ErrorPage err={getStudentError}/>
     }
     if(isGetStudentLoading){
         <Loader/>
     }
-
-    console.log(studentData)
 
     return (
         <Box className="flex min-w-screen min-h-screen justify-center">
@@ -76,12 +64,7 @@ export default function ProfilePage() {
                             <Stack
                                 direction="column"
                                 spacing={1}>
-                                {isImageLoading ? (
-                                        <Box sx={{ display: 'flex' }}>
-                                            <CircularProgress />
-                                        </Box>
-                                    )
-                                    :(
+
                                         <AspectRatio
                                             ratio="1"
                                             maxHeight={200}
@@ -91,14 +74,11 @@ export default function ProfilePage() {
                                                 borderRadius: '100%',
                                             }}>
                                             <img
-                                                src={imageData && imageData.size > 0   ? URL.createObjectURL(imageData) : "/unknown.jpg"}
-
+                                                src={studentData.image.url != ""  ? studentData.image.url  : "/unknown.jpg"}
                                                 loading="lazy"
                                                 alt=""
                                             />
                                         </AspectRatio>
-                                    )
-                                }
                             </Stack>
                             <Stack
                                 spacing={2}
@@ -109,7 +89,7 @@ export default function ProfilePage() {
                                         className="flex-1">
                                         <FormLabel>Имя</FormLabel>
                                         <Box className="pt-2 pb-2 pl-3 pr-8 border-2 rounded">
-                                            {studentData.data.name && studentData.data.name !== "" ? studentData.data.name : "Нет данных"}
+                                            {studentData.name && studentData.name !== "" ? studentData.name : "Нет данных"}
                                         </Box>
                                     </Stack>
                                     <Stack
@@ -117,7 +97,7 @@ export default function ProfilePage() {
                                         className="flex-1">
                                         <FormLabel>Дата рождения</FormLabel>
                                         <Box className="pt-2 pb-2 pl-3 pr-8 border-2 rounded">
-                                            {studentData.data.birth_date.string && studentData.data.birth_date.string !== "" ? studentData.data.birth_date.string : "Нет данных"}
+                                            {studentData.birth_date && studentData.birth_date !== "" ? studentData.birth_date : "Нет данных"}
                                         </Box>
                                     </Stack>
                                 </div>
@@ -127,7 +107,7 @@ export default function ProfilePage() {
                                         className="flex-1">
                                         <FormLabel>Место рождения</FormLabel>
                                         <Box className="pt-2 pb-2 pl-3 pr-8 border-2 rounded">
-                                            {studentData.data.location && studentData.data.location !== "" ? studentData.data.location : "Нет данных"}
+                                            {studentData.location && studentData.location !== "" ? studentData.location : "Нет данных"}
                                         </Box>
                                     </Stack>
                                     <Stack
@@ -135,7 +115,7 @@ export default function ProfilePage() {
                                         className="flex-1">
                                         <FormLabel>Номер паспорта</FormLabel>
                                         <Box className="pt-2 pb-2 pl-3 pr-8 border-2 rounded">
-                                            {studentData.data.pass_number && studentData.data.pass_number !== "" ? studentData.data.pass_number : "Нет данных"}
+                                            {studentData.pass_number && studentData.pass_number !== "" ? studentData.pass_number : "Нет данных"}
                                         </Box>
                                     </Stack>
                                 </div>
@@ -146,7 +126,7 @@ export default function ProfilePage() {
                                         className="flex-1">
                                         <FormLabel>ПИНФЛ</FormLabel>
                                         <Box className="pt-2 pb-2 pl-3 pr-8 border-2 rounded">
-                                            {studentData.data.pinfl && studentData.data.pinfl !== "" ? studentData.data.pinfl : "Нет данных"}
+                                            {studentData.pinfl && studentData.pinfl !== "" ? studentData.pinfl : "Нет данных"}
                                         </Box>
                                     </Stack>
                                     <Stack
@@ -154,7 +134,7 @@ export default function ProfilePage() {
                                         className="flex-1">
                                         <FormLabel>Номер телефона</FormLabel>
                                         <Box className="pt-2 pb-2 pl-3 pr-8 border-2 rounded">
-                                            {studentData.data.phone_number && studentData.data.phone_number !== "" ? studentData.data.phone_number : "Нет данных"}
+                                            {studentData.phone_number && studentData.phone_number !== "" ? studentData.phone_number : "Нет данных"}
                                         </Box>
                                     </Stack>
                                 </div>
@@ -165,7 +145,7 @@ export default function ProfilePage() {
                                         className="flex-1">
                                         <FormLabel>Направление</FormLabel>
                                         <Box className="pt-2 pb-2 pl-3 pr-8 border-2 rounded">
-                                            {studentData.data.study_dir && studentData.data.study_dir !== "" ? studentData.data.study_dir : "Нет данных"}
+                                            {studentData.study_dir && studentData.study_dir !== "" ? studentData.study_dir : "Нет данных"}
                                         </Box>
                                     </Stack>
                                     <Stack
@@ -173,7 +153,7 @@ export default function ProfilePage() {
                                         className="flex-1">
                                         <FormLabel>Курс</FormLabel>
                                         <Box className="pt-2 pb-2 pl-3 pr-8 border-2 rounded">
-                                            {studentData.data.course && studentData.data.course !== "" ? studentData.data.course : "Нет данных"}
+                                            {studentData.course && studentData.course !== "" ? studentData.course : "Нет данных"}
                                         </Box>
                                     </Stack>
                                 </div>
@@ -184,7 +164,7 @@ export default function ProfilePage() {
                                         className="flex-1">
                                         <FormLabel>Отец</FormLabel>
                                         <Box className="pt-2 pb-2 pl-3 pr-8 border-2 rounded">
-                                            {studentData.data.father && studentData.data.father !== ""  ? studentData.data.father : "Нет данных"}
+                                            {studentData.father && studentData.father !== ""  ? studentData.father : "Нет данных"}
                                         </Box>
                                     </Stack>
                                     <Stack
@@ -192,7 +172,7 @@ export default function ProfilePage() {
                                         className="flex-1">
                                         <FormLabel>Мама</FormLabel>
                                         <Box className="pt-2 pb-2 pl-3 pr-8 border-2 rounded">
-                                            {studentData.data.mother && studentData.data.mother !== "" ? studentData.data.mother : "Нет данных"}
+                                            {studentData.mother && studentData.mother !== "" ? studentData.mother : "Нет данных"}
                                         </Box>
                                     </Stack>
                                 </div>
@@ -202,7 +182,7 @@ export default function ProfilePage() {
                                         className="flex-1">
                                         <FormLabel>Группа</FormLabel>
                                         <Box className="pt-2 pb-2 pl-3 pr-8 border-2 rounded">
-                                            {studentData.data.group && studentData.data.group !== "" ? studentData.data.group : "Нет данных"}
+                                            {studentData.group_name && studentData.group_name !== "" ? studentData.group_name : "Нет данных"}
                                         </Box>
                                     </Stack>
                                 </div>

@@ -70,7 +70,13 @@ export const Header = memo(() => {
 
     const handleViewNotifications = () => {
         if (data && data?.length > 0){
-            mutate(data)
+            let reqData = []
+            for (let i = 0 ; i < data.length ; i++){
+                reqData.push(data[i].id)
+            }
+            console.log(reqData)
+
+            mutate(reqData)
         }
     }
 

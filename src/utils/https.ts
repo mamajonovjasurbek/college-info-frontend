@@ -1,8 +1,9 @@
 import Cookies from 'universal-cookie';
-import { IStudent } from '../types/student';
+import {ICreateStudent, IImageKey, IStudent, IStudentExcel, IUpdateStudent} from '../types/student';
 import {ICreateUser, IUserPassword} from '../types/user';
 import { saveAs } from 'file-saver';
 import axios from 'axios';
+import {IGroup} from "../types/group.ts";
 import {INotification} from "../types/notification.ts";
 
 const instance = axios.create({
@@ -44,8 +45,9 @@ export async function updateUserByID({ id, data }: IUpdateUserProps) {
 
     const response = await instance({
         method: 'put',
-        url: '/users/' + id,
+        url: '/users/password',
         data: {
+            id : id,
             password: data.newPassword,
         },
         headers: {
@@ -102,7 +104,7 @@ export async function deleteUserById(id: string) {
     return response.data.data;
 }
 
-export async function fetchGroups() {
+export async function fetchGroups():Promise<IGroup[]> {
     const cookies = new Cookies();
     const token = cookies.get('Authorization');
 
@@ -114,7 +116,7 @@ export async function fetchGroups() {
         },
     });
 
-    return response.data.data;
+    return response.data.data as IGroup[];
 }
 
 export async function createUser(data: ICreateUser) {
@@ -128,7 +130,7 @@ export async function createUser(data: ICreateUser) {
             name: data.name,
             login: data.login,
             password: data.password,
-            role_id: data.role_id,
+            role: data.role,
             group_id: data.group_id,
         },
         headers: {
@@ -139,7 +141,7 @@ export async function createUser(data: ICreateUser) {
     return response.data.data;
 }
 
-export async function postStudentsData(data: IStudent[]) {
+export async function postStudentsData(data: IStudentExcel[]) {
     const cookies = new Cookies();
     const token = cookies.get('Authorization');
 
@@ -172,49 +174,14 @@ export async function deleteStudentByID(id: string) {
     return response.data.data;
 }
 
-interface IUpdateProps {
-    id: string;
-    data: IStudent;
-}
-
-export async function updateStudentByIDOld({ id, data }: IUpdateProps) {
+export async function updateStudentByID( data: IUpdateStudent) {
     const cookies = new Cookies();
     const token = cookies.get('Authorization');
 
     console.log(data);
     const response = await instance({
         method: 'put',
-        url: '/students/' + id,
-        data: {
-            location: data.location,
-            pass_number: data.pass_number,
-            phone_number: data.phone_number,
-            study_dir: data.study_dir,
-            course: data.course,
-            group: data.group,
-        },
-        headers: {
-            Authorization: `Bearer ${token}`,
-        },
-    });
-
-    return response.data.data;
-}
-
-interface  IUpdateWithImageProps{
-    id : string,
-    data : FormData
-}
-
-
-export async function updateStudentByID({ id, data }: IUpdateWithImageProps) {
-    const cookies = new Cookies();
-    const token = cookies.get('Authorization');
-
-    console.log(data);
-    const response = await instance({
-        method: 'put',
-        url: '/students/' + id,
+        url: '/students',
         data: data,
         headers: {
             Authorization: `Bearer ${token}`,
@@ -224,7 +191,7 @@ export async function updateStudentByID({ id, data }: IUpdateWithImageProps) {
     return response.data.data;
 }
 
-export async function getStudentByID(id: string) {
+export async function getStudentByID(id: string): Promise<IStudent> {
     const cookies = new Cookies();
     const token = cookies.get('Authorization');
 
@@ -236,44 +203,10 @@ export async function getStudentByID(id: string) {
         },
     });
 
-    return response.data;
+    return response.data.data as IStudent; // Указываем, что данные соответствуют типу IStudent.
 }
 
-export async function getStudentImageByID(id: string) {
-    const cookies = new Cookies();
-    const token = cookies.get('Authorization');
-
-    const response = await instance({
-        method: 'get',
-        url: '/students/image/' + id,
-        headers: {
-            Authorization: `Bearer ${token}`,
-        },
-        responseType: 'blob',
-    });
-
-    console.log(response.data)
-
-    return response.data;
-}
-
-export async function createStudentOld(data: IStudent) {
-    const cookies = new Cookies();
-    const token = cookies.get('Authorization');
-
-    const response = await instance({
-        method: 'post',
-        url: '/students',
-        data: data,
-        headers: {
-            Authorization: `Bearer ${token}`,
-        },
-    });
-
-    return response.data.data;
-}
-
-export async function createStudent(data: FormData) {
+export async function createStudent(data: ICreateStudent) {
     const cookies = new Cookies();
     const token = cookies.get('Authorization');
 
@@ -285,7 +218,6 @@ export async function createStudent(data: FormData) {
         data: data,
         headers: {
             Authorization: `Bearer ${token}`,
-            'Content-Type': 'multipart/form-data',
         },
     });
     return response.data.data;
@@ -298,8 +230,7 @@ export async function deleteSelectedStudent(id: string[]) {
 
     const response = await instance({
         method: 'delete',
-        url: '/students',
-        data: id,
+        url: '/students/' +id,
         headers: {
             Authorization: `Bearer ${token}`,
         },
@@ -308,7 +239,7 @@ export async function deleteSelectedStudent(id: string[]) {
     return response.data.data;
 }
 
-export async function fetchNotifications() {
+export async function fetchNotifications() :Promise<INotification[]>{
     const cookies = new Cookies();
     const token = cookies.get('Authorization');
 
@@ -320,17 +251,93 @@ export async function fetchNotifications() {
         },
     });
 
-    return response.data.data;
+    return response.data.data as INotification[];
 }
 
-export async function viewNotifications(data : INotification[]) {
+export async function viewNotifications(data : string[]) {
     const cookies = new Cookies();
     const token = cookies.get('Authorization');
 
     const response = await instance({
         method: 'post',
         url: '/notifications/view',
-        data : data,
+        data : {
+            ids:data
+        },
+        headers: {
+            Authorization: `Bearer ${token}`,
+        },
+    });
+
+    return response.data.data;
+}
+
+
+export async function updateStudentImage( data: FormData) {
+    const cookies = new Cookies();
+    const token = cookies.get('Authorization');
+
+    console.log(data);
+    const response = await instance({
+        method: 'post',
+        url: '/students/add/image',
+        data: data,
+        headers: {
+            Authorization: `Bearer ${token}`,
+        },
+    });
+
+    return response.data.data;
+}
+
+
+export async function uploadStudentImage( data: FormData) :Promise<IImageKey>{
+    const cookies = new Cookies();
+    const token = cookies.get('Authorization');
+
+    console.log(data);
+    const response = await instance({
+        method: 'post',
+        url: '/students/cache/file',
+        data: data,
+        headers: {
+            Authorization: `Bearer ${token}`,
+        },
+    });
+
+    console.log(response.data.data)
+    return response.data.data;
+}
+
+export async function uploadStudentsExcel( data: FormData){
+    const cookies = new Cookies();
+    const token = cookies.get('Authorization');
+
+    console.log(data);
+    const response = await instance({
+        method: 'post',
+        url: '/students/excel/upload',
+        data: data,
+        headers: {
+            Authorization: `Bearer ${token}`,
+        },
+    });
+
+    console.log(response.data.data)
+    return response.data.data;
+}
+
+
+export async function createGroup(data: string) {
+    const cookies = new Cookies();
+    const token = cookies.get('Authorization');
+
+    const response = await instance({
+        method: 'post',
+        url: '/groups/create',
+        data: {
+            name: data,
+        },
         headers: {
             Authorization: `Bearer ${token}`,
         },

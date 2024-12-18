@@ -2,8 +2,11 @@ export interface IUser {
     id: string;
     name: string;
     login: string;
-    role_id: string;
+    role: number;
     group_id: string;
+    group_name: string;
+    created_at : string;
+    updated_at : string;
 }
 
 export interface IUserPassword {
@@ -15,7 +18,6 @@ export interface ICreateUser {
     name: string;
     login: string;
     password: string;
-    role_id: number;
+    role: number;
     group_id: string;
-    image: File;
 }

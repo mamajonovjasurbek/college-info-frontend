@@ -2,9 +2,10 @@ import { Table } from '@tanstack/react-table';
 import { useMemo } from 'react';
 import { IStudent } from '../types/student';
 import { IUser } from '../types/user';
+import {IGroup} from "../types/group.ts";
 
 interface IProps {
-    table: Table<IStudent> | Table<IUser>;
+    table: Table<IStudent> | Table<IUser> | Table<IGroup>;
 }
 
 export const Pagination = (props: IProps) => {

@@ -60,7 +60,6 @@ export const AddUserComponent = memo(() => {
                 .invalidateQueries({
                     queryKey: ['users'],
                 })
-                .then((r) => console.log(r));
             queryClient.invalidateQueries({
                 queryKey: ['notifications'] ,
             });
@@ -219,7 +218,7 @@ export const AddUserComponent = memo(() => {
                                         id="role-select"
                                         value={role}
                                         label="Роль"
-                                        {...register('role_id', {
+                                        {...register('role', {
                                             required: true,
                                         })}
                                         onChange={handleChangeRole}>

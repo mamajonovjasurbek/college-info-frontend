@@ -3,9 +3,10 @@ import { Table } from '@tanstack/react-table';
 import { IStudent } from '../../types/student';
 import { IUser } from '../../types/user';
 import { muiBtn } from '../../styles/mui-styles.ts';
+import {IGroup} from "../../types/group.ts";
 
 interface IProps {
-    table: Table<IStudent> | Table<IUser>;
+    table: Table<IStudent> | Table<IUser> | Table<IGroup>;
     handleRowSelectionData?: () => Promise<void>;
     reloadTable: () => void;
 }
